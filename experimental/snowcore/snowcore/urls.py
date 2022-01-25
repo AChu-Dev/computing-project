@@ -22,3 +22,6 @@ urlpatterns = [
     path('', include("skiing.urls")),
     path('admin/', admin.site.urls),
 ]
+
+
+
