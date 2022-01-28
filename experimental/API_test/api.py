@@ -1,7 +1,6 @@
-import json
-import requests
 import os
 from dotenv import load_dotenv
+import pandas as pd
 
 def main():
     try:
@@ -10,15 +9,17 @@ def main():
     except Exception:
         print("Exception has occured", Exception)
     
-    url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/Southampton/last15days?include=fcst%2Cobs%2Chistfcst%2Cstats%2Chours&key=" + key + "&options=preview&contentType=json"
-    url2 ="https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/Southampton/2021-06-09/2021-07-16?include=fcst%2Cobs%2Chistfcst%2Cstats%2Chours&key=" + key + "&options=preview&contentType=json"
-    res = requests.get(url2).text
-    print(res)
-
-    res_json = json.loads(res)
-    print(res_json)
-    print(int(len(res)/24))
+    url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/Southampton/2022-01-26/2022-02-11?unitGroup=metric&elements=datetime%2CdatetimeEpoch%2Cname%2Caddress%2Clatitude%2Clongitude%2Ctempmax%2Ctempmin%2Ctemp%2Cfeelslikemax%2Cfeelslikemin%2Cfeelslike%2Chumidity%2Cprecip%2Cprecipprob%2Cprecipcover%2Cpreciptype%2Csnow%2Csnowdepth%2Cwindgust%2Cwindspeed%2Cwinddir%2Cpressure%2Ccloudcover%2Csunrise%2Csunset%2Cmoonphase&include=days&key=" + key + "&maxStations=1&contentType=json"
     
+    res = pd.read_json(url)
+
+    data = []
+    for i in range(len(res['days'])):
+        data.append(res['days'][i])
+
+    df = pd.DataFrame(data)
+    print(df)
+    return df
 
 if __name__ == "__main__":
     main()
