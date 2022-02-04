@@ -10,6 +10,7 @@ def main(start_date = 0, end_date = 0):
     except Exception:
         print("Exception has occured", Exception)
 
+    # TODO: ADD check not to exceed the api limitation of 1000 records per call
     if end_date == 0 and start_date == 0:
         start_date = datetime.datetime.now() - datetime.timedelta(days=30)
         start_date = start_date.strftime("%Y-%m-%d")

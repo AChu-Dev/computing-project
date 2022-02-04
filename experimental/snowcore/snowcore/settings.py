@@ -41,11 +41,13 @@ print("Server Base Dir: {} ".format(BASE_DIR))
 
 INSTALLED_APPS = [
     'django.contrib.admin',
+    'users.apps.UsersConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+#    'django_extensions'
 ]
 
 MIDDLEWARE = [
