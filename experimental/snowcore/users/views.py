@@ -10,7 +10,7 @@ def register(req):
             form.save()
             username = form.cleaned_data.get('username')
             messages.info(req, f'Details: {username}')
-#            return redirect('<url>')
+            return redirect("login")
     else:
         form = UserRegister()
     return render(req, 'users/register.html', {'form': form})

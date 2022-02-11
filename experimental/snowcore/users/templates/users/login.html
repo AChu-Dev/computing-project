@@ -4,15 +4,15 @@
     <form method="POST">
       {% csrf_token %}
       <fieldset class="form-group">
-        <legend class="register">Register</legend>
+        <legend class="register">Login</legend>
         {{ form.as_p }}
       </fieldset>
       <div>
-        <button type="submit" class="sign-up">Sign Up</button>
+        <button type="submit" class="sign-up">Login</button>
       </div>
     </form>
     <div class="sign-in">
-      <small><a href="{% url "login" %}">Have an account?</a></small>
+      <small><a href="{% url "register" %}">Need an account?</a></small>
     </div>
   </div>
   <div>
