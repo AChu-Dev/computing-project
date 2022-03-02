@@ -1,32 +1,25 @@
-import os
-from dotenv import load_dotenv
-import pandas as pd
-import datetime
+import requests
+import time
 
-def main(start_date = 0, end_date = 0):
-    try:
-        load_dotenv()
-        key = os.getenv("API_KEY")
-    except Exception:
-        print("Exception has occured", Exception)
+class api:
+	url = "https://api.weatherunlocked.com/api/resortforecast/54883444?app_id=a3fd6c9a&app_key=027a1023047a432b9ed2e4a7db484a07"
+	last_request = 0
+	request_interval = 87
+	cached = None
 
-    # TODO: ADD check not to exceed the api limitation of 1000 records per call
-    if end_date == 0 and start_date == 0:
-        start_date = datetime.datetime.now() - datetime.timedelta(days=30)
-        start_date = start_date.strftime("%Y-%m-%d")
-        end_date = datetime.datetime.now().strftime("%Y-%m-%d")
-    
-    url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/Southampton/" + start_date + "/" + end_date +"?unitGroup=metric&elements=datetime%2CdatetimeEpoch%2Cname%2Caddress%2Clatitude%2Clongitude%2Ctempmax%2Ctempmin%2Ctemp%2Cfeelslikemax%2Cfeelslikemin%2Cfeelslike%2Chumidity%2Cprecip%2Cprecipprob%2Cprecipcover%2Cpreciptype%2Csnow%2Csnowdepth%2Cwindgust%2Cwindspeed%2Cwinddir%2Cpressure%2Ccloudcover%2Csunrise%2Csunset%2Cmoonphase&include=days&key=" + key + "&maxStations=1&contentType=json"
-    res = pd.read_json(url)
+	def __init__(self) -> None:
+		pass
 
-    data = []
-    for i in range(len(res['days'])):
-        data.append(res['days'][i])
+	def get_weather(self):
+		try:
+			if self.updatable():
+				response = requests.get(self.url, headers={"Accept": "application/json"})
+				if response:
+					self.cached = response.json()["forecast"]
+					self.last_request = time.time()
+		except:
+			self.cached = None
+		return self.cached
 
-    df = pd.DataFrame(data)
-    df['datetime'] = pd.to_datetime(df['datetime'], format="%Y-%m-%d", errors='coerce')
-    print(df)
-    return df
-
-if __name__ == "__main__":
-    main()
+	def updatable(self):
+		return (self.last_request < (time.time() - self.request_interval) or self.cached == None)
