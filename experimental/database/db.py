@@ -286,6 +286,16 @@ def insertWeather(date,min_temp,max_temp,feels_like,precipitation_probability,vi
             snow_depth,
             mountain_segment)
     curs.execute(query)
+def updateWeather(setparam,setval,whereparam,whereval,curs):
+    if setparam or setval or whereparam or whereval != '' or NULL or '*':
+
+        query = """UPDATE Weather
+                   SET {} = {}
+                   WHERE {} = {};""".format(setparam,setval,whereparam,whereval)
+        print(query)
+        curs.execute(query)
+    else:
+        print("can only edit one entry per query OR your values are empty")
 
 def insertFavourite(user_id,resort_id,curs):
     query = """INSERT INTO Favourites(user_id,resort_id) VALUES({},{});""".format(user_id,resort_id)
