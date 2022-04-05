@@ -1,1 +1,1 @@
-web: gunicorn <com617-joe-group1>.wsgi --log-file -
+web: gunicorn <snowcore>.wsgi 
