@@ -1,6 +1,7 @@
 django
 gunicorn
 django-heroku
+django-extensions
 requests
 python-dotenv
 
