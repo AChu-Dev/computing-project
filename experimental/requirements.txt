@@ -2,5 +2,5 @@ django
 gunicorn
 django-heroku
 requests
-dotenv
+python-dotenv
 
