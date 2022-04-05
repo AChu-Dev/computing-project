@@ -26,7 +26,7 @@ load_dotenv(dotenv_path=dotenv_path)
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("DJANGOKEY") 
+SECRET_KEY = os.getenv("DJANGOKEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -143,11 +143,7 @@ WHITENOISE_USE_FINDERS = True
 STATIC_URL = 'static/'
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 print(PROJECT_ROOT)
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
-if not DEBUG:
-    STATIC_ROOT = os.path.abspath(os.path.join(PROJECT_ROOT, '..', 'static'))
-STATICFILES_DIRS = ['']
-print(STATIC_ROOT)
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
