@@ -29,10 +29,12 @@ load_dotenv(dotenv_path=dotenv_path)
 SECRET_KEY = os.getenv("DJANGOKEY") 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
-        "*",
+        '*',
+        '127.0.0.1',
+        '.herokuapp.com',
         ]
 
 print("Server Base Dir: {} ".format(BASE_DIR))
