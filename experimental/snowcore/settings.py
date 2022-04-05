@@ -35,6 +35,7 @@ ALLOWED_HOSTS = [
         '*',
         '127.0.0.1',
         '.herokuapp.com',
+        'https://com617-joe-group1.herokuapp.com/'
         ]
 
 print("Server Base Dir: {} ".format(BASE_DIR))
