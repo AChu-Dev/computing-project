@@ -15,3 +15,14 @@ def register(req):
     else:
         form = UserRegister()
     return render(req, 'users/register.html', {'form': form})
+
+
+def get_user_list(req):
+    if req.method == "GET":
+        pass
+        # Grab information for database
+
+
+def reset_password(req):
+    if req.method == "POST":
+        pass
