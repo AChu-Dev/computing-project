@@ -1,0 +1,24 @@
+/* 
+ * This was just added to make sure the static files where being found correctly in the webpages
+ * We can swap this out for whatever CSS you guys want to use.
+ **/
+.nav-bar {
+    border-bottom: solid 10px;
+    margin: 0;
+    width: 100%;
+    left: 0;
+    top: 0;
+    list-style-type: none;
+    display: block;
+}
+
+.nav-item {
+    display: inline;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: grey;
+    padding: 2px;
+}
+
