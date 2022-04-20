@@ -1,17 +1,19 @@
 import sqlite3
 import pandas as pd
 
-
 def newcon(db):
     try:
         con = sqlite3.connect('{}.db'.format(db))
-        print('{}.db'.format(db))
         curs = con.cursor()        
         return con,curs
     except:
-        print('database not found')
+        return None, None
+
+def closecon(con):
+    con.close()
 
 def tablecreate(curs,con):
+    success = True
     resorts_table= """CREATE TABLE IF NOT EXISTS Resorts (
                       resort_id INTEGER PRIMARY KEY AUTOINCREMENT,
                       name VARCHAR(255) NOT NULL,
@@ -56,29 +58,24 @@ def tablecreate(curs,con):
     try:
         curs.execute(resorts_table)
         con.commit()
-        print('region table found/successfully generated')
     except:
-        print('region table missing/failed to generate')
+        success = False
     try:
         curs.execute(weather_table)
         con.commit()
-        print('weather table found/successfully generated')
     except:
-        print('weather table missing/failed to generate')
+        success = False
     try:
         curs.execute(user_table)
         con.commit()
-        print('user table found/successfully generated')
     except:
-        print('user table missing/failed to generate')
+        success = False
     try:
         curs.execute(favourites_table)
         con.commit()
-        print('favourites table found/successfully generated')
     except:
-        print('favourites table missing/failed to generate')
- 
-
+        success = False
+    return success
 
 #--------------------------------------------------------------------------
 # GENERIC QUERY FUNCTIONS, UNSAFE AND UNTESTED
@@ -195,7 +192,7 @@ def getWeather(resort,curs):
         'name'])
     return result
 
-def getUser(user,curs):
+def getUsers(user,curs):
     if type(user) == int:
         query = """SELECT *
                    FROM Users
@@ -265,6 +262,7 @@ def insertUser(user_name,first_name,last_name,email,permission,num_fav_resorts,c
             permission,
             num_fav_resorts)
     curs.execute(query)
+    return True
 
 def insertResort(name,address,longitude,latitude,curs):
     query = """INSERT INTO Resorts(name,address,longitude,latitude) VALUES('{}','{}',{},{});""".format(
@@ -273,6 +271,7 @@ def insertResort(name,address,longitude,latitude,curs):
             longitude,
             latitude)
     curs.execute(query)
+    return True
 
 def insertWeather(date,min_temp,max_temp,feels_like,precipitation_probability,visibility,wind_direction,wind_speed,snow_depth,mountain_segment,resort_id,curs):
     query = """INSERT INTO Weather(resort_id,date,min_temp,max_temp,feels_like,precipitation_probability,visibility,wind_direction,wind_speed,snow_depth,mountain_segment) VALUES({},'{}',{},{},{},{},{},'{}',{},{},{});""".format(resort_id,date,
@@ -286,20 +285,12 @@ def insertWeather(date,min_temp,max_temp,feels_like,precipitation_probability,vi
             snow_depth,
             mountain_segment)
     curs.execute(query)
-def updateWeather(setparam,setval,whereparam,whereval,curs):
-    if setparam or setval or whereparam or whereval != '' or NULL or '*':
-
-        query = """UPDATE Weather
-                   SET {} = {}
-                   WHERE {} = {};""".format(setparam,setval,whereparam,whereval)
-        print(query)
-        curs.execute(query)
-    else:
-        print("can only edit one entry per query OR your values are empty")
+    return True
 
 def insertFavourite(user_id,resort_id,curs):
     query = """INSERT INTO Favourites(user_id,resort_id) VALUES({},{});""".format(user_id,resort_id)
     curs.execute(query)
+    return True
 
 
 def removeResort(resort_id,curs):
@@ -310,8 +301,9 @@ def removeResort(resort_id,curs):
         curs.execute(query)
         curs.execute(query2)
         curs.execute(query3)
+        return True
     else:
-        print('stop trying to delete everything, please')
+        return False
 
 def removeUser(user_id,curs):
     if user_id != '*':         
@@ -319,20 +311,22 @@ def removeUser(user_id,curs):
         query2 = """DELETE FROM Favourites WHERE user_id = {};""".format(user_id)
         curs.execute(query)
         curs.execute(query2)
+        return True
     else:
-        print('stop trying to delete everything, please')
+        return False
+
 def removeWeather(param,val,curs):
     if param or val != '*':
         query = """DELETE FROM Weather WHERE {} = {};""".format(param,val)
         curs.execute(query)
+        return True
     else:
-        print('stop trying to delete everything, please')
-
+        return False
 
 def removeFavourite(user_id,resort_id,curs):
     if user_id or resort_id != '*':
         query = """DELETE FROM Favourites WHERE user_id = {} AND resort_id = {};""".format(user_id,resort_id)
         curs.execute(query)
+        return True
     else:
-        print('stop trying to delete everything, please')
-
+        return False
