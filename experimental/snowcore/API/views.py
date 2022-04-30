@@ -41,6 +41,7 @@ class UserDetailView(generics.RetrieveAPIView):
 
 user_detail_view = UserDetailView.as_view()
 
+
 class UserListView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -48,6 +49,26 @@ class UserListView(generics.ListAPIView):
 user_list_view = UserListView.as_view()
 
 
+class UserUpdateView(generics.UpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    lookup_field = 'pk'
+
+    def update(self, serializer):
+        instance = serializer.save()
+
+user_update_view = UserUpdateView.as_view()
+
+
+class UserDeleteView(generics.DestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    lookup_field = 'pk'
+
+    def delete(self, instance):
+        super.delete(instance)
+
+user_delete_view = UserDeleteView.as_view()
 # RESORT VIEWS
 
 class ResortViewSet(viewsets.ModelViewSet):

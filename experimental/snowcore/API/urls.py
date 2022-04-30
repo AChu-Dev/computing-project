@@ -15,6 +15,8 @@ urlpatterns = [
         path('user/create/', views.user_create_view),
         path('user/detail/<int:pk>', views.user_detail_view),
         path('user/list/', views.user_list_view),
+        path('user/update/<int:pk>', views.user_update_view),
+        path('user/delete/<int:pk>', views.user_delete_view),
         path('resort/create/', views.resort_create_view),
         path('resort/detail/<int:pk>', views.resort_detail_view),
         path('resort/list/', views.resort_list_view),
