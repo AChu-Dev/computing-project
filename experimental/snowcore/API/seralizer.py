@@ -2,19 +2,19 @@ from rest_framework import serializers
 from .models import User, Resort
 
 class UserSerializer(serializers.ModelSerializer):
-#    user_id = serializers.SeriliazerMethodField(read_only=True)
-#    permission = serializers.SeriliazerMethodField(read_only=True)
-#    num_fav_resorts = serializers.SeriliazerMethodField(read_only=True)
+#    id = serializers.SerializerMethodField(read_only=True)
+#    permission = serializers.SerializerMethodField(read_only=True)
+#    num_fav_resorts = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = User
         fields = (
+#                'id',
                 "username",
                 "firstName",
                 "lastName",
-                "email",)
-#                "permission",
-#                "num_fav_resorts",
-#                "user_id")
+                "email",
+                "permission",
+                "num_fav_resorts",)
 
 
 class ResortSerializer(serializers.ModelSerializer):

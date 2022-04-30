@@ -52,7 +52,7 @@ user_list_view = UserListView.as_view()
 class UserUpdateView(generics.UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    lookup_field = 'pk'
+    # lookup_field = 'pk'
 
     def update(self, serializer):
         instance = serializer.save()
@@ -63,7 +63,7 @@ user_update_view = UserUpdateView.as_view()
 class UserDeleteView(generics.DestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    lookup_field = 'pk'
+    # lookup_field = 'pk'
 
     def delete(self, instance):
         super.delete(instance)
