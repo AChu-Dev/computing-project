@@ -2,7 +2,7 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
-
+import render_statics
 
 def main():
     """Run administrative tasks."""
@@ -17,6 +17,9 @@ def main():
         ) from exc
     execute_from_command_line(sys.argv)
 
+def setup():
+    render_statics.render_historic()
 
 if __name__ == '__main__':
+    setup()
     main()
