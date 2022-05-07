@@ -1,0 +1,12 @@
+
+{% load static %}
+<!-- Add CSS/JS Here to make it load on all pages -->
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+<ul class="nav-bar">
+    <li class="nav-item"><a href="{% url 'index' %}" class="nav-link">Home</a></li>
+    <li class="nav-item"><a href="{% url 'register' %}" class="nav-link">Register</a></li>
+    <li class="nav-item"><a href="{% url 'login' %}" class="nav-link">Login</a></li>
+</ul>
+
+
