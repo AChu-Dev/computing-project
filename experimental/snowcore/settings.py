@@ -51,9 +51,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
-    'whitenoise.runserver_nostatic',
-    # 'core',
-]
+    'API.apps.ApiConfig',
+    'rest_framework',
+    'rest_framework.authtoken',
+    ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -105,6 +106,22 @@ DATABASES = {
     }
 }
 
+REST_FRAMEWORK = { # Use default parser if you want everything in JSON format
+#    'DEFAULT_RENDERER_CLASSES': [
+#        'rest_framework.renderers.JSONRenderer',
+#    ],
+#    'DEFAULT_PARSER_CLASSES': [
+#        'rest_framework.parsers.JSONParser',
+#    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        'rest_framework.authentication.BasicAuthentication',
+        "API.auth.TokenAuthentication",
+        ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly"
+        ]
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
