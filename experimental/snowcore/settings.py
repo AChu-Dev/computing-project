@@ -88,8 +88,8 @@ TEMPLATES = [
 ]
 
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
-    #BASE_DIR / "staticfiles"
+    #BASE_DIR / "static",
+    BASE_DIR / "staticfiles"
 ]
 
 
