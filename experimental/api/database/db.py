@@ -169,9 +169,7 @@ def getWeather(resort,curs):
                                   mountain_segment,
                                   Resorts.name
                            FROM Weather
-
                             INNER JOIN Resorts on Resorts.resort_id = Weather.resort_id
-
                            WHERE Resorts.name = '{}'
                            ORDER BY date;""".format(resort)
 
@@ -227,7 +225,6 @@ def getUserFavourites(user,curs):
                    FROM Favourites
                       INNER JOIN Resorts on Resorts.resort_id = Favourites.resort_id
                       INNER JOIN Users on Users.user_id = Favourites.user_id
-
                    WHERE user_id = {};""".format(user)
     if type(user) == str:
         if user == '*':
