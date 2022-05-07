@@ -44,7 +44,7 @@ print("Server Base Dir: {} ".format(BASE_DIR))
 
 INSTALLED_APPS = [
     'django.contrib.admin',
-    'users.apps.UsersConfig',
+#    'users.apps.UsersConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -73,7 +73,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            BASE_DIR.joinpath("skiing/templates/skiing/"),
+#            BASE_DIR.joinpath("skiing/templates/skiing/"),
             ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -88,8 +88,8 @@ TEMPLATES = [
 ]
 
 #STATICFILES_DIRS = [
-#    BASE_DIR / "static",
-    #BASE_DIR / "staticfiles"
+#        ("main", os.path.join(BASE_DIR, "static")),
+#        os.path.join("static"),
 #]
 
 
@@ -160,6 +160,7 @@ USE_TZ = True
 WHITENOISE_USE_FINDERS = True
 
 if not DEBUG:
+    print(os.path.join(BASE_DIR, 'static'))
     STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
