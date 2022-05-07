@@ -1,14 +1,11 @@
 from rest_framework import serializers
-from .models import User, Resort
+from .models import User, Resort, Favourite
+
 
 class UserSerializer(serializers.ModelSerializer):
-#    id = serializers.SerializerMethodField(read_only=True)
-#    permission = serializers.SerializerMethodField(read_only=True)
-#    num_fav_resorts = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = User
         fields = (
-#                'id',
                 "username",
                 "firstName",
                 "lastName",
@@ -25,4 +22,13 @@ class ResortSerializer(serializers.ModelSerializer):
                 "address",
                 "longitude",
                 "latitude",
+                )
+
+
+class FavouriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Favourite
+        fields = (
+                "resort_id",
+                "user_id",
                 )

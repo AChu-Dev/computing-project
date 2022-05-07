@@ -5,17 +5,21 @@ User = settings.AUTH_USER_MODEL
 
 # Create your models here.
 
+
 class User(models.Model):
-#    id = models.ForeignKey(User, primary_key=True, default=1, on_delete=models.CASCADE, unique=True)
     username = models.CharField(max_length=32)
     firstName = models.CharField(max_length=32)
     lastName = models.CharField(max_length=64, blank=True, null=True)
     email = models.CharField(max_length=64)
-    permission = models.IntegerField()
-    num_fav_resorts = models.IntegerField()
+    permission = models.IntegerField(default=0, editable=False)
+    num_fav_resorts = models.IntegerField(default=0, editable=False)
 
     def __self__(self):
         return self.firstName, self.lastName
+
+    @property
+    def path(self):
+        return f"/user/{self.pk}/"
 
 
 class Resort(models.Model):
@@ -26,3 +30,8 @@ class Resort(models.Model):
 
     def __self__(self):
         return self.name
+
+
+class Favourite(models.Model):
+    resort_id = models.ForeignKey(Resort, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
