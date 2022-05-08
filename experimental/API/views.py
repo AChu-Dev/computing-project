@@ -4,18 +4,14 @@ from django.http import JsonResponse
 from rest_framework import viewsets, generics, authentication, permissions
 from .seralizer import UserSerializer, ResortSerializer, FavouriteSerializer
 from .models import User, Resort, Favourite
+from django.views.generic.detail import SingleObjectMixin
+from django.views import View
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
-#from .auth import TokenAuthentication
 # Create your views here.
 
 
 # USER VIEWS
-
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all().order_by('firstName')
-    serializer_class = UserSerializer
-
 
 class UserCreateView(generics.CreateAPIView):
     queryset = User.objects.all().order_by('firstName')
@@ -24,7 +20,7 @@ class UserCreateView(generics.CreateAPIView):
             authentication.SessionAuthentication,
 #            TokenAuthentication,
             ]
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.AllowAny]
 
     #def create(self, seralizer):
     #    firstName = seralizer.get('firstName')
@@ -73,6 +69,29 @@ class UserUpdateView(generics.UpdateAPIView):
 user_update_view = UserUpdateView.as_view()
 
 
+class UserUpdateMixin(SingleObjectMixin, View):
+    def dispatch(self, request, pk, *args, **kwargs):
+        if request.user.is_staff:
+            self.fields = [
+                    "username",
+                    "firstName",
+                    "lastName",
+                    "email",
+                    "permission",
+                    "num_fav_resorts",
+                    ]
+        else:
+            self.fields = [
+                    "firstName",
+                    "lastName",
+                    "email",
+                    ]
+
+        return super().dispatch(request, pk, *args, **kwargs)
+
+user_update_mixin = UserUpdateMixin.as_view()
+
+
 class UserDeleteView(generics.DestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -84,6 +103,12 @@ class UserDeleteView(generics.DestroyAPIView):
 
 
 user_delete_view = UserDeleteView.as_view()
+
+
+class UserAPIViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    lookup_field = 'pk'
 
 # RESORT VIEWS
 
@@ -154,6 +179,11 @@ class ResortUpdateView(generics.UpdateAPIView):
 resort_update_view = ResortUpdateView.as_view()
 
 
+class ResortAPIViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    lookup_field = 'pk'
+
 # Favourite
 class FavouriteCreateView(generics.CreateAPIView):
     queryset = Favourite.objects.all().order_by('user_id')
@@ -206,6 +236,12 @@ class FavouriteUpdateView(generics.UpdateAPIView):
 
 
 favourite_update_view = FavouriteUpdateView().as_view()
+
+
+class FavouriteAPIViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    lookup_field = 'pk'
 
 
 class IsAdmin():

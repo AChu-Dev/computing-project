@@ -11,8 +11,8 @@ class User(models.Model):
     firstName = models.CharField(max_length=32)
     lastName = models.CharField(max_length=64, blank=True, null=True)
     email = models.CharField(max_length=64)
-    permission = models.IntegerField(default=0, editable=False)
-    num_fav_resorts = models.IntegerField(default=0, editable=False)
+    permission = models.IntegerField(default=0)
+    num_fav_resorts = models.IntegerField(default=0)
 
     def __self__(self):
         return self.firstName, self.lastName

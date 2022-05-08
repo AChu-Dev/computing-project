@@ -6,6 +6,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
+                "pk",
                 "username",
                 "firstName",
                 "lastName",
@@ -18,6 +19,7 @@ class ResortSerializer(serializers.ModelSerializer):
     class Meta:
         model = Resort
         fields = (
+                "pk",
                 "name",
                 "address",
                 "longitude",
@@ -29,6 +31,7 @@ class FavouriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Favourite
         fields = (
+                "pk",
                 "resort_id",
                 "user_id",
                 )
