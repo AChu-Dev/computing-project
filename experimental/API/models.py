@@ -11,6 +11,7 @@ class User(models.Model):
     firstName = models.CharField(max_length=32)
     lastName = models.CharField(max_length=64, blank=True, null=True)
     email = models.CharField(max_length=64)
+    password = models.CharField(max_length=32)
     permission = models.IntegerField(default=0)
     num_fav_resorts = models.IntegerField(default=0)
 

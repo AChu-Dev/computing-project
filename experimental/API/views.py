@@ -1,4 +1,7 @@
 from django.shortcuts import render
+from django.http import HttpResponse
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
 import json
 from django.http import JsonResponse
 from rest_framework import viewsets, generics, authentication, permissions
@@ -244,31 +247,51 @@ class FavouriteAPIViewSet(viewsets.ModelViewSet):
     lookup_field = 'pk'
 
 
-class IsAdmin():
-    pass
+@api_view(["POST"])
+def signup(request):
+    username = request.POST['username']
+    firstName = request.POST['firstName']
+    lastName = request.POST['lastName']
+    email = request.POST['email']
+    password1 = request.POST['password1']
+    password2 = request.POST['password2']
+
+    if User.objects.filter(username=username):
+        messages.error(request, "Username already exist! Please try some other username.")
+        return HttpResponse("userExists")
+
+    elif User.objects.filter(email=email).exists():
+        messages.error(request, "Email Already Registered!!")
+        return HttpResponse("emailExists")
+
+    elif password1 != password2:
+        messages.error(request, "Passwords didn't matched!!")
+        return HttpResponse("passwordNotTheSame")
+
+    newUser = User.objects.create_user(username, email, password1)
+    newUser.first_name = firstName
+    newUser.last_name = lastName
+    newUser.is_active = False
+    newUser.save()
+    return HttpResponse("success")
 
 
-@api_view(["GET"])
-def api_home(request, *args, **kwargs):
-    data = {}
-    print(request.GET)
-    body = request.body
-    try:
-        data = json.loads(body)
-    except:
-        pass
+@api_view(["POST"])
+def signin(request):
+    username = request.POST["username"]
+    password = request.POST["password"]
 
-    data['params'] = dict(request.GET)
-    data['headers'] = dict(request.headers)
-    data['content_type'] = request.content_type
+    auth = authenticate(username=username, password = password)
 
-    return JsonResponse(data)
+    if auth is not None:
+        login(request, auth)
+        firstName = auth.first_name
+        return HttpResponse("success")
+    else:
+        return HttpResponse("fail")
 
 
-@api_view(['POST'])
-def api_post(request, *args, **kwargs):
-    seralizer = UserSerializer(data=request.data)
-    if seralizer.is_valid(raise_exception=True):
-        instance = seralizer.save()
-        print(instance)
-        return Response(seralizer.data)
+@api_view(["POST"])
+def signout(request):
+    logout(request)
+    return("success")

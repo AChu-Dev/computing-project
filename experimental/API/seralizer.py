@@ -12,7 +12,9 @@ class UserSerializer(serializers.ModelSerializer):
                 "lastName",
                 "email",
                 "permission",
-                "num_fav_resorts",)
+                "num_fav_resorts",
+                "password",
+                )
 
 
 class ResortSerializer(serializers.ModelSerializer):
