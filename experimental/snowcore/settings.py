@@ -69,27 +69,26 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'snowcore.urls'
 
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            BASE_DIR.joinpath("skiing/templates/skiing/"),
-            ],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
-]
+#TEMPLATES = [
+#    {
+#        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+#        'DIRS': [
+#            #BASE_DIR.joinpath("skiing/templates/skiing/"),
+#            ],
+#        'APP_DIRS': True,
+#        'OPTIONS': {
+#            'context_processors': [
+#                'django.template.context_processors.debug',
+#                'django.template.context_processors.request',
+#                'django.contrib.auth.context_processors.auth',
+#                'django.contrib.messages.context_processors.messages',
+#            ],
+#        },
+#    },
+#]
 
 STATICFILES_DIRS = [
-    #BASE_DIR / "static",
-    BASE_DIR / "staticfiles"
+#    BASE_DIR / "staticfiles"
 ]
 
 
@@ -160,7 +159,8 @@ USE_TZ = True
 WHITENOISE_USE_FINDERS = True
 
 if not DEBUG:
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 STATIC_URL = '/static/'
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 #print(PROJECT_ROOT)
