@@ -6,7 +6,7 @@ from .seralizer import UserSerializer, ResortSerializer, FavouriteSerializer
 from .models import User, Resort, Favourite
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
-from .auth import TokenAuthentication
+#from .auth import TokenAuthentication
 # Create your views here.
 
 
@@ -22,7 +22,7 @@ class UserCreateView(generics.CreateAPIView):
     serializer_class = UserSerializer
     authentication_classes = [
             authentication.SessionAuthentication,
-            TokenAuthentication,
+#            TokenAuthentication,
             ]
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 

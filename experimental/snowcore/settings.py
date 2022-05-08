@@ -69,23 +69,23 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'snowcore.urls'
 
-#TEMPLATES = [
-#    {
-#        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-#        'DIRS': [
-#            #BASE_DIR.joinpath("skiing/templates/skiing/"),
-#            ],
-#        'APP_DIRS': True,
-#        'OPTIONS': {
-#            'context_processors': [
-#                'django.template.context_processors.debug',
-#                'django.template.context_processors.request',
-#                'django.contrib.auth.context_processors.auth',
-#                'django.contrib.messages.context_processors.messages',
-#            ],
-#        },
-#    },
-#]
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            #BASE_DIR.joinpath("skiing/templates/skiing/"),
+            ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
 
 STATICFILES_DIRS = [
 #    BASE_DIR / "staticfiles"
@@ -115,7 +115,7 @@ REST_FRAMEWORK = { # Use default parser if you want everything in JSON format
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
         'rest_framework.authentication.BasicAuthentication',
-        "API.auth.TokenAuthentication",
+#        "API.auth.TokenAuthentication",
         ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticatedOrReadOnly"
