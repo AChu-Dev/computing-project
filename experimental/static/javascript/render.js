@@ -3,7 +3,7 @@
 const prepend = "/static/";
 
 if ("serviceWorker" in navigator) {
-	window.addEventListener("load", function () {
+	window.addEventListener("load", () => {
 		navigator.serviceWorker
 			.register(prepend + "javascript/sw.js")
 			.then(res => console.log("service worker registered"))
@@ -25,7 +25,7 @@ const loading = (clear) => {
 	main.innerHTML = "";
 	if (!clear) {
 		const loader = document.createElement("div");
-		addClasses(loader, ["container", "mx-auto", "text-center", "pb-12", "pt-6"]);
+		addClasses(loader, ["container", "mx-auto", "text-center", "pb-12", "pt-6", "cursor-wait"]);
 		loader.innerText = "Loading...";
 		main.appendChild(loader);
 	}
@@ -136,12 +136,123 @@ const showResort = async (resort) => {
 	document.title = name + " | Snowcore";
 };
 
+const signIn = (register, usernameString = "") => {
+	const signInContainer = document.createElement("form");
+	addClasses(signInContainer, ["container", "w-full", "mx-auto"]);
+	const names = [document.createElement("input"), document.createElement("input")];
+	const email = document.createElement("input");
+	const username = document.createElement("input");
+	username.value = usernameString;
+	const passwords = [document.createElement("input"), document.createElement("input")];
+	addClasses(names[0], ["rounded-md", "border-black", "border", "block", "mx-auto"]);
+	addClasses(names[1], ["rounded-md", "border-black", "border", "block", "mx-auto"]);
+	addClasses(email, ["rounded-md", "border-black", "border", "block", "mx-auto"]);
+	addClasses(username, ["rounded-md", "border-black", "border", "block", "mx-auto"]);
+	addClasses(passwords[0], ["rounded-md", "border-black", "border", "block", "mx-auto"]);
+	addClasses(passwords[1], ["rounded-md", "border-black", "border", "block", "mx-auto"]);
+	names[0].setAttribute("required", "required");
+	names[1].setAttribute("required", "required");
+	email.setAttribute("required", "required");
+	username.setAttribute("required", "required");
+	passwords[0].setAttribute("required", "required");
+	passwords[1].setAttribute("required", "required");
+	email.type = "email";
+	passwords[0].type = "password";
+	passwords[1].type = "password";
+	const tips = [document.createElement("p"), document.createElement("p"), document.createElement("p"), document.createElement("p"), document.createElement("p"), document.createElement("p")];
+	tips[0].innerText = "First name:";
+	addClasses(tips[0], ["block", "text-center"]);
+	tips[1].innerText = "Surname:";
+	addClasses(tips[1], ["block", "text-center"]);
+	tips[2].innerText = "Email:";
+	addClasses(tips[2], ["block", "text-center"]);
+	tips[3].innerText = "Username:";
+	addClasses(tips[3], ["block", "text-center"]);
+	tips[4].innerText = "Password:";
+	addClasses(tips[4], ["block", "text-center"]);
+	tips[5].innerText = "Repeat password:";
+	addClasses(tips[5], ["block", "text-center"]);
+	const submit = document.createElement("input");
+	addClasses(submit, ["rounded-md", "block", "my-4", "p-2", "cursor-pointer", "bg-sky-500", "hover:bg-sky-700", "px-5", "py-2", "text-sm", "leading-5", "rounded-full", "font-semibold", "text-white", "mx-auto"]);
+	submit.type = "submit";
+	submit.value = {true:"Register",false:"Sign in"}[register];
+	if (register) {
+		document.title = "Sign up | Snowcore";
+		signInContainer.appendChild(tips[0]);
+		signInContainer.appendChild(names[0]);
+		signInContainer.appendChild(tips[1]);
+		signInContainer.appendChild(names[1]);
+		signInContainer.appendChild(tips[2]);
+		signInContainer.appendChild(email);
+		signInContainer.appendChild(tips[3]);
+		signInContainer.appendChild(username);
+		signInContainer.appendChild(tips[4]);
+		signInContainer.appendChild(passwords[0]);
+		signInContainer.appendChild(tips[5]);
+		signInContainer.appendChild(passwords[1]);
+		signInContainer.appendChild(submit);
+	} else {
+		document.title = "Sign in | Snowcore";
+		signInContainer.appendChild(tips[3]);
+		signInContainer.appendChild(username);
+		signInContainer.appendChild(tips[4]);
+		signInContainer.appendChild(passwords[0]);
+		signInContainer.appendChild(submit);
+		const register = document.createElement("input");
+		addClasses(register, ["rounded-md", "block", "my-4", "p-2", "cursor-pointer", "bg-sky-500", "hover:bg-sky-700", "px-5", "py-2", "text-sm", "leading-5", "rounded-full", "font-semibold", "text-white", "mx-auto"]);
+		register.type = "button";
+		register.value = "Register?";
+		register.addEventListener("click", () => {
+			signIn(true, username.value);
+		});
+		signInContainer.appendChild(register);
+	}
+	signInContainer.addEventListener("submit", async (e) => {
+		e.preventDefault();
+		let requestBody = {"username": username.value, password1: passwords[0].value, password2: passwords[1].value, firstName: names[0].value, lastName: names[1].value, email: email.value};
+		if (!register) {
+			delete requestBody["password1"];
+			delete requestBody["password2"];
+			delete requestBody["firstName"];
+			delete requestBody["lastName"];
+			delete requestBody["email"];
+			requestBody["password"] = passwords[0].value;
+		}
+		loading(false);
+		const request = await fetch("/rest_api/sign" + {true:"up",false:"in"}[register], {
+			method: 'POST',
+			headers: {
+				"Accept": "application/json",
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({"username": username.value, password1: passwords[0].value, password2: passwords[1].value, firstName: names[0].value, lastName: names[1].value, email: email.value})
+		}).catch(e => {
+			signIn(register, requestBody["username"]);
+			if (register) {
+				alert("Failed to register your account.");
+			} else {
+				alert("Failed to sign in to your account.");
+			}
+		});
+		const content = await request.json();
+		console.log(content);
+	});
+	loading(true);
+	main.appendChild(signInContainer);
+};
+
 const newPage = (pageId) => {
 	loading(false);
 	switch (pageId) {
 		case 0:
 			document.title = "Snowcore";
 			showResorts([{ "id": 0, "name": "name", "image": null, "isFavourite": true }, { "id": 0, "name": "name", "image": null, "isFavourite": true }, { "id": 0, "name": "name", "image": null, "isFavourite": true }, { "id": 0, "name": "name", "image": null, "isFavourite": true }, { "id": 0, "name": "name", "image": null, "isFavourite": true }, { "id": 0, "name": "name", "image": null, "isFavourite": true }, { "id": 0, "name": "name", "image": null, "isFavourite": true }, { "id": 0, "name": "name", "image": null, "isFavourite": true }]);
+			break;
+		case 1:
+			signIn(false);
+			break;
+		case 2:
+			signIn(true);
 			break;
 		default:
 			break;
@@ -154,8 +265,13 @@ window.addEventListener('DOMContentLoaded', () => {
 	} else {
 		newPage(pageId);
 	}
+	let userState = 0;
 	document.getElementById("headerMain").addEventListener("click", () => {
 		pageId = 0;
 		newPage(pageId);
-	})
+	});
+	document.getElementById("user").addEventListener("click", () => {
+		pageId = (userState + 1);
+		newPage(pageId);
+	});
 });
