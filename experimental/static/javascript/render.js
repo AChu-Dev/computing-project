@@ -1,10 +1,21 @@
 "use strict";
 
+const prepend = "/static/";
+
+if ("serviceWorker" in navigator) {
+	window.addEventListener("load", function () {
+		navigator.serviceWorker
+			.register(prepend + "javascript/sw.js")
+			.then(res => console.log("service worker registered"))
+			.catch(err => console.log("service worker not registered", err))
+	})
+}
+
 let weather = null;
 
 const historicalWeather = async () => {
 	if (weather == null)
-		weather = await fetch("/static/historical_weather.json").then(response => response.json());
+		weather = await fetch(prepend + "historical_weather.json").then(response => response.json());
 	return weather;
 };
 
@@ -30,7 +41,7 @@ const createResort = (id, name, image, isFavourite) => {
 	const container = document.createElement("div");
 	addClasses(container, ["w-full", "md:w-1/3", "xl:w-1/4", "p-6", "flex", "flex-col", "cursor-pointer"]);
 	const heroImage = document.createElement("img");
-	heroImage.src = image || "/static/images/skiing.jpg";
+	heroImage.src = image || prepend + "images/skiing.jpg";
 	addClasses(heroImage, ["hover:grow", "hover:shadow-lg", "h-64"]);
 	const containerFlex = document.createElement("div");
 	addClasses(containerFlex, ["pt-3", "flex", "items-center", "justify-between"]);
@@ -76,12 +87,12 @@ const showResort = async (resort) => {
 	let resortDescription = "example";
 	let totalFavourites = 0;
 	const heroImage = document.createElement("div");
-	heroImage.style.backgroundImage = "url(" + (image || "/static/images/skiing.jpg") + ")";
+	heroImage.style.backgroundImage = "url(" + (image || prepend + "images/skiing.jpg") + ")";
 	addClasses(heroImage, ["container", "w-full", "mx-auto", "h-96", "bg-cover", "bg-center", "bg-no-repeat", "relative", "mb-12", "rounded-t-2xl", "mt-6"]);
 	const weatherIcon = document.createElement("div");
 	addClasses(weatherIcon, ["w-24", "h-24", "rounded-full", "bg-white", "bg-no-repeat", "bg-contain", "bg-center", "mx-auto", "absolute", "inset-x-0"]);
 	weatherIcon.style.bottom = "-48px";
-	weatherIcon.style.backgroundImage = "url(\"/static/icons/" + weatherImage + "\")";
+	weatherIcon.style.backgroundImage = "url(\"" + prepend + "icons/" + weatherImage + "\")";
 	weatherIcon.title = "Current weather of resort";
 	heroImage.append(weatherIcon);
 	const containerFlex = document.createElement("div");
@@ -118,7 +129,7 @@ const showResort = async (resort) => {
 		top = false;
 	});
 	let historicWeather = document.createElement("img");
-	historicWeather.src = "/static/historic_weather_2021.png";
+	historicWeather.src = prepend + "historic_weather_2021.png";
 	addClasses(historicWeather, ["mx-auto"]);
 	main.appendChild(historicWeather);
 	main.appendChild(mapLink);

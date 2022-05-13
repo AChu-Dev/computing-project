@@ -1,0 +1,15 @@
+{
+	"name": "Snowcore",
+	"short_name": "Snowcore",
+	"start_url": "/index.html",
+	"display": "standalone",
+	"background_color": "#fdfdfd",
+	"theme_color": "#f7f7f7",
+	"orientation": "portrait-primary",
+	"icons": [
+	  {
+		"src": "/images/snowcore.png",
+		"type": "image/png", "sizes": "256x256"
+	  },
+	]
+  }
