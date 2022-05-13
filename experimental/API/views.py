@@ -215,6 +215,20 @@ class FavouriteListView(generics.ListAPIView):
 favourite_list_view = FavouriteListView.as_view()
 
 
+class FavouriteListByUser(generics.ListAPIView):
+    def queryset(self):
+        user_id = self.request.quary_params.get("user_id")
+
+        queryset = Favourite.objects.filter(user_id=5)
+        return queryset
+
+#    queryset = Favourite.objects.all()
+    serializer_class = FavouriteSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+favourite_list_user = FavouriteListByUser.as_view()
+
+
 class FavouriteDeleteView(generics.DestroyAPIView):
     queryset = Favourite.objects.all()
     serializer_class = FavouriteSerializer
