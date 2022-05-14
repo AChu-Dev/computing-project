@@ -21,12 +21,12 @@ const historicalWeather = async () => {
 
 const loading = (clear) => {
 	let main = document.getElementById("main");
-	addClasses(main, ["mb-6"]);
+	addClasses(main, ["mb-6", "flex-auto"]);
 	main.innerHTML = "";
 	if (!clear) {
 		const loader = document.createElement("div");
 		loader.id = "loaderMessage";
-		addClasses(loader, ["container", "mx-auto", "text-center", "pb-12", "pt-6", "cursor-wait"]);
+		addClasses(loader, ["container", "mx-auto", "text-center", "pb-12", "pt-6", "cursor-wait", "select-none"]);
 		loader.innerText = "Loading...";
 		main.appendChild(loader);
 	}
@@ -89,24 +89,24 @@ const showResort = async (resort) => {
 	let totalFavourites = 0;
 	const heroImage = document.createElement("div");
 	heroImage.style.backgroundImage = "url(" + (image || prepend + "images/skiing.jpg") + ")";
-	addClasses(heroImage, ["container", "w-full", "mx-auto", "h-96", "bg-cover", "bg-center", "bg-no-repeat", "relative", "mb-12", "rounded-t-2xl", "mt-6"]);
+	addClasses(heroImage, ["container", "w-full", "mx-auto", "h-96", "bg-cover", "bg-center", "bg-no-repeat", "relative", "mb-12", "rounded-t-2xl", "mt-6", "select-none"]);
 	const weatherIcon = document.createElement("div");
-	addClasses(weatherIcon, ["w-24", "h-24", "rounded-full", "bg-white", "bg-no-repeat", "bg-contain", "bg-center", "mx-auto", "absolute", "inset-x-0"]);
+	addClasses(weatherIcon, ["w-24", "h-24", "rounded-full", "bg-white", "bg-no-repeat", "bg-contain", "bg-center", "mx-auto", "absolute", "inset-x-0", "select-none"]);
 	weatherIcon.style.bottom = "-48px";
 	weatherIcon.style.backgroundImage = "url(\"" + prepend + "icons/" + weatherImage + "\")";
 	weatherIcon.title = "Current weather of resort";
 	heroImage.append(weatherIcon);
 	const containerFlex = document.createElement("div");
-	addClasses(containerFlex, ["flex", "items-center", "px-8", "mb-8", "justify-center"]);
+	addClasses(containerFlex, ["flex", "items-center", "px-8", "mb-8", "justify-center", "select-none"]);
 	const resortName = document.createElement("h2");
 	resortName.innerText = name;
-	addClasses(resortName, ["container", "px-8", "text-center", "text-4xl", "pb-2", "mx-auto"]);
+	addClasses(resortName, ["container", "px-8", "text-center", "text-4xl", "pb-2", "mx-auto", "select-none"]);
 	const favourite = document.createElement("svg");
 	favourite.innerHTML = "<svg class=\"ml-2 h-6 w-6 fill-current text-gray-500 hover:text-black\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z\" /></svg>";
 	let descriptions = resortDescription.split("\n");
 	loading(true);
 	let mapLink = document.createElement("a");
-	addClasses(mapLink, ["px-8", "pb-6", "underline", "text-center", "text-blue-600", "hover:text-blue-800", "visited:text-purple-600", "container", "mx-auto", "w-full", "flex", "justify-center", "cursor-pointer"]);
+	addClasses(mapLink, ["px-8", "pb-6", "underline", "text-center", "text-blue-600", "hover:text-blue-800", "visited:text-purple-600", "container", "mx-auto", "w-full", "flex", "justify-center", "cursor-pointer", "select-none"]);
 	mapLink.innerText = "Piste map";
 	let main = document.getElementById("main");
 	main.appendChild(heroImage);
@@ -122,7 +122,7 @@ const showResort = async (resort) => {
 	descriptions.forEach(paragraph => {
 		let descriptionParagraph = document.createElement("p");
 		descriptionParagraph.innerText = paragraph;
-		addClasses(descriptionParagraph, ["px-8", "text-justify", "pb-6", "container", "mx-auto"]);
+		addClasses(descriptionParagraph, ["px-8", "text-justify", "pb-6", "container", "mx-auto", "select-none"]);
 		if (top) {
 			addClasses(descriptionParagraph, ["mt-8"]);
 		}
@@ -131,7 +131,7 @@ const showResort = async (resort) => {
 	});
 	let historicWeather = document.createElement("img");
 	historicWeather.src = prepend + "historic_weather_2021.png";
-	addClasses(historicWeather, ["mx-auto"]);
+	addClasses(historicWeather, ["mx-auto", "select-none"]);
 	main.appendChild(historicWeather);
 	main.appendChild(mapLink);
 	document.title = name + " | Snowcore";
@@ -162,23 +162,24 @@ const signIn = (register, usernameString = "") => {
 	passwords[1].type = "password";
 	const tips = [document.createElement("p"), document.createElement("p"), document.createElement("p"), document.createElement("p"), document.createElement("p"), document.createElement("p")];
 	tips[0].innerText = "First name:";
-	addClasses(tips[0], ["block", "text-center"]);
+	addClasses(tips[0], ["block", "text-center", "select-none"]);
 	tips[1].innerText = "Surname:";
-	addClasses(tips[1], ["block", "text-center"]);
+	addClasses(tips[1], ["block", "text-center", "select-none"]);
 	tips[2].innerText = "Email:";
-	addClasses(tips[2], ["block", "text-center"]);
+	addClasses(tips[2], ["block", "text-center", "select-none"]);
 	tips[3].innerText = "Username:";
-	addClasses(tips[3], ["block", "text-center"]);
+	addClasses(tips[3], ["block", "text-center", "select-none"]);
 	tips[4].innerText = "Password:";
-	addClasses(tips[4], ["block", "text-center"]);
+	addClasses(tips[4], ["block", "text-center", "select-none"]);
 	tips[5].innerText = "Repeat password:";
-	addClasses(tips[5], ["block", "text-center"]);
+	addClasses(tips[5], ["block", "text-center", "select-none"]);
 	const submit = document.createElement("input");
-	addClasses(submit, ["rounded-md", "block", "my-4", "p-2", "cursor-pointer", "bg-sky-500", "hover:bg-sky-700", "px-5", "py-2", "text-sm", "leading-5", "rounded-full", "font-semibold", "text-white", "mx-auto"]);
+	addClasses(submit, ["rounded-md", "block", "my-4", "p-2", "cursor-pointer", "bg-sky-500", "hover:bg-sky-700", "px-5", "py-2", "text-sm", "leading-5", "rounded-full", "font-semibold", "text-white", "mx-auto", "select-none"]);
 	submit.type = "submit";
 	submit.value = {true:"Register",false:"Sign in"}[register];
 	if (register) {
 		document.title = "Sign up | Snowcore";
+		addClasses(tips[0], ["pt-12"]);
 		signInContainer.appendChild(tips[0]);
 		signInContainer.appendChild(names[0]);
 		signInContainer.appendChild(tips[1]);
@@ -194,13 +195,14 @@ const signIn = (register, usernameString = "") => {
 		signInContainer.appendChild(submit);
 	} else {
 		document.title = "Sign in | Snowcore";
+		addClasses(tips[3], ["pt-12"]);
 		signInContainer.appendChild(tips[3]);
 		signInContainer.appendChild(username);
 		signInContainer.appendChild(tips[4]);
 		signInContainer.appendChild(passwords[0]);
 		signInContainer.appendChild(submit);
 		const register = document.createElement("input");
-		addClasses(register, ["rounded-md", "block", "my-4", "p-2", "cursor-pointer", "bg-sky-500", "hover:bg-sky-700", "px-5", "py-2", "text-sm", "leading-5", "rounded-full", "font-semibold", "text-white", "mx-auto"]);
+		addClasses(register, ["rounded-md", "block", "my-4", "p-2", "cursor-pointer", "bg-sky-500", "hover:bg-sky-700", "px-5", "py-2", "text-sm", "leading-5", "rounded-full", "font-semibold", "text-white", "mx-auto", "select-none"]);
 		register.type = "button";
 		register.value = "Register?";
 		register.addEventListener("click", () => {
@@ -239,7 +241,7 @@ const signIn = (register, usernameString = "") => {
 		console.log(content);
 	});
 	loading(true);
-	main.appendChild(signInContainer);
+	document.getElementById("main").appendChild(signInContainer);
 };
 
 const newPage = async (pageId) => {
@@ -286,11 +288,18 @@ const newPage = async (pageId) => {
 			signIn(true);
 			break;
 		default:
+			const loader = document.getElementById("loaderMessage");
+			loader.classList.remove("cursor-wait");
+			loader.classList.remove("pb-12");
+			loader.classList.remove("pt-6");
+			addClasses(loader, ["pt-12", "pb-10"]);
+			loader.innerText = "An unknown error occurred.";
 			break;
 	}
 };
 
 window.addEventListener('DOMContentLoaded', () => {
+	addClasses(document.getElementById("main"), ["flex-auto"]);
 	if (typeof pageId === "undefined") {
 		console.error("Invalid page ID");
 	} else {

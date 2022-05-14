@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
 	<meta charset="UTF-8" />
 	<link rel="manifest" href="/static/manifest.json" />
@@ -29,25 +28,18 @@
 			transform: scale(1.02);
 		}
 	</style>
-
 </html>
-
-<body class="bg-white text-gray-600 work-sans leading-normal text-base tracking-normal">
+<body class="bg-white text-gray-600 work-sans leading-normal text-base tracking-normal flex flex-col min-h-screen">
 	<!--Nav-->
 	<nav id="header" class="w-full z-30 top-0 py-1 border-b-2">
 		<div class="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 px-6 py-3">
 			<div class="hidden md:flex md:items-center md:w-auto w-full order-3 md:order-1" id="menu">
 			</div>
-
-
 			<div class="order-1 md:order-2">
-				<a class="flex items-center tracking-wide no-underline hover:no-underline font-bold text-gray-800 text-xl cursor-pointer"
+				<a class="flex items-center tracking-wide no-underline hover:no-underline font-bold text-gray-800 text-xl cursor-pointer select-none"
 					id="headerMain">SNOWCORE</a>
 			</div>
-
-
 			<div class="order-2 md:order-3 flex items-center" id="user">
-
 				<a class="inline-block no-underline hover:text-black" href="#">
 					<svg class="fill-current hover:text-black" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
 						viewBox="0 0 24 24">
@@ -57,29 +49,22 @@
 					</svg>
 				</a>
 			</div>
-
-
 	</nav>
 	<!--Nav-->
-
 	<main id="main">
-		<h1 class="container mx-auto p-12">Snowcore requires a compatible browser with JavaScript support to load.</h1>
+		<h1 class="container mx-auto p-12 select-none">Snowcore requires a compatible browser with JavaScript support to load.</h1>
 	</main>
 	<!--Footer-->
-	<footer class="container mx-auto bg-white py-8 border-t border-gray-400">
-		<div class="container flex px-3 py-8 ">
+	<footer class="container mx-auto bg-white border-t border-gray-400">
+		<div class="container flex px-3 pt-8 pb-4">
 			<div class="w-full mx-auto flex flex-wrap">
-				<div class="flex w-full ">
+				<div class="flex w-full">
 					<div class="px-3 md:px-0">
-						<h3 class="font-bold text-gray-900">&copy; Snowcore 2022</h3>
+						<h3 class="font-bold text-gray-900 select-none">&copy; Snowcore 2022</h3>
 					</div>
 				</div>
-
-
 			</div>
 		</div>
 	</footer>
-
 </body>
-
 </html>
