@@ -299,7 +299,6 @@ const newPage = async (pageId) => {
 };
 
 window.addEventListener('DOMContentLoaded', () => {
-	addClasses(document.getElementById("main"), ["flex-auto"]);
 	if (typeof pageId === "undefined") {
 		console.error("Invalid page ID");
 	} else {
