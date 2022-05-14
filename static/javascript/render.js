@@ -27,7 +27,7 @@ const getWeather = async (resortId) => {
 		},
 		{
 			"id": 333014,
-			"url": "http://api.weatherunlocked.com/api/resortforecast/333014?app_id=62707ed6&app_key=10981bcbfd38f7a0b53bb253990c0cbf&hourly_interval=6"
+			"url": "https://api.weatherunlocked.com/api/resortforecast/333014?app_id=62707ed6&app_key=10981bcbfd38f7a0b53bb253990c0cbf&hourly_interval=6"
 		},
 	];
 	let url = null;
