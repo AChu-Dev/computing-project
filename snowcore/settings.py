@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'API.apps.ApiConfig',
     'rest_framework',
+    'corsheaders',
     'rest_framework.authtoken',
     ]
 
@@ -61,7 +62,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware'
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'corsheaders.middleware.CorsMiddleware'
 ]
 
 ROOT_URLCONF = 'snowcore.urls'
@@ -83,6 +85,20 @@ TEMPLATES = [
         },
     },
 ]
+
+CORS_ALLOWED_ORIGINS = [
+        'http://127.0.0.1:8000',
+        'https://com617-joe-group1.herokuapp.com'
+        ]
+
+CORS_ALLOW_METHODS = (
+        'GET',
+        'POST',
+        'PUT',
+        'PATCH',
+        'DELETE',
+        'OPTIONS'
+        )
 
 STATICFILES_DIRS = [
 #    BASE_DIR / "staticfiles"
