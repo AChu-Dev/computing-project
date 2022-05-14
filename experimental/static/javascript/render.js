@@ -1,11 +1,11 @@
 "use strict";
 
-const prepend = "/static/";
+const prepend = "/";
 
 if ("serviceWorker" in navigator) {
 	window.addEventListener("load", () => {
 		navigator.serviceWorker
-			.register(prepend + "javascript/sw.js")
+			.register("sw.js")
 			.then(res => console.log("service worker registered"))
 			.catch(err => console.log("service worker not registered", err))
 	})
