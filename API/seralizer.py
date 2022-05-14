@@ -26,6 +26,7 @@ class ResortSerializer(serializers.ModelSerializer):
                 "address",
                 "longitude",
                 "latitude",
+                "description",
                 )
 
 
