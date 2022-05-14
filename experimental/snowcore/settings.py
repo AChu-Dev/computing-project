@@ -19,9 +19,6 @@ dotenv_path = BASE_DIR.joinpath(".env")
 load_dotenv(dotenv_path=dotenv_path)
 
 
-#Used to debug 
-#print(os.getenv("DJANGOKEY"))
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
@@ -29,7 +26,7 @@ load_dotenv(dotenv_path=dotenv_path)
 SECRET_KEY = os.getenv("DJANGOKEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
         '*',
@@ -105,17 +102,10 @@ DATABASES = {
     }
 }
 
-REST_FRAMEWORK = { # Use default parser if you want everything in JSON format
-#    'DEFAULT_RENDERER_CLASSES': [
-#        'rest_framework.renderers.JSONRenderer',
-#    ],
-#    'DEFAULT_PARSER_CLASSES': [
-#        'rest_framework.parsers.JSONParser',
-#    ],
+REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
         'rest_framework.authentication.BasicAuthentication',
-#        "API.auth.TokenAuthentication",
         ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticatedOrReadOnly"
@@ -158,12 +148,11 @@ USE_TZ = True
 
 WHITENOISE_USE_FINDERS = True
 
-if not DEBUG:
-    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# if not DEBUG:
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 STATIC_URL = '/static/'
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-#print(PROJECT_ROOT)
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 

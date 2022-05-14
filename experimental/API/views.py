@@ -21,7 +21,6 @@ class UserCreateView(generics.CreateAPIView):
     serializer_class = UserSerializer
     authentication_classes = [
             authentication.SessionAuthentication,
-#            TokenAuthentication,
             ]
     permission_classes = [permissions.AllowAny]
 
@@ -91,6 +90,7 @@ class UserUpdateMixin(SingleObjectMixin, View):
                     ]
 
         return super().dispatch(request, pk, *args, **kwargs)
+
 
 user_update_mixin = UserUpdateMixin.as_view()
 
@@ -188,6 +188,8 @@ class ResortAPIViewSet(viewsets.ModelViewSet):
     lookup_field = 'pk'
 
 # Favourite
+
+
 class FavouriteCreateView(generics.CreateAPIView):
     queryset = Favourite.objects.all().order_by('user_id')
     serializer_class = FavouriteSerializer
@@ -216,17 +218,35 @@ favourite_list_view = FavouriteListView.as_view()
 
 
 class FavouriteListByUser(generics.ListAPIView):
-    def queryset(self):
-        user_id = self.request.quary_params.get("user_id")
-
-        queryset = Favourite.objects.filter(user_id=5)
-        return queryset
-
-#    queryset = Favourite.objects.all()
     serializer_class = FavouriteSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
+    def get_queryset(self):
+        if self.request.method == "GET":
+            queryset = Favourite.objects.all()
+            user_id = self.request.GET.get("user_id", None)
+            if user_id is not None:
+                queryset = queryset.filter(user_id=user_id)
+            return queryset
+
+
 favourite_list_user = FavouriteListByUser.as_view()
+
+
+class FavouriteListByResort(generics.ListAPIView):
+    serializer_class = FavouriteSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        if self.request.method == "GET":
+            queryset = Favourite.objects.all()
+            resort_id = self.request.GET.get("resort_id", None)
+            if resort_id is not None:
+                queryset = queryset.filter(resort_id=resort_id)
+            return queryset
+
+
+favourite_list_resort = FavouriteListByResort.as_view()
 
 
 class FavouriteDeleteView(generics.DestroyAPIView):

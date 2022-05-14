@@ -23,7 +23,8 @@ urlpatterns = [
         path('<int:pk>/favourite/update/', views.favourite_update_view),
         path('<int:pk>/favourite/delete/', views.favourite_delete_view),
         path('favourite/list/', views.favourite_list_view),
-#        path('favourite/list/user/<int:user_id>', views.favourite_list_user),
+        path('favourite/list/user/', views.favourite_list_user),
+        path('favourite/list/resort/', views.favourite_list_resort),
 
         path('signup/', views.signup),
         path('signin/', views.signin),
