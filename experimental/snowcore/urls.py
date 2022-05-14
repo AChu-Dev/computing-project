@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import path
 from django.urls.conf import include
+from django.views.generic.base import RedirectView
 from users import views as user_views
 
 from rest_framework.routers import DefaultRouter
@@ -27,7 +28,7 @@ router.register("User Router", UserAPIViewSet, basename="User API")
 router.register("Resort Router", ResortAPIViewSet, basename="Resort API")
 router.register("Favourite Router", FavouriteAPIViewSet, basename="Resort API")
 
-
+class index(RedirectView): url = "/index.html"
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -36,5 +37,6 @@ urlpatterns = [
 #    path('logout/', auth_views.LogoutView.as_view(template_name="users/logout.html"), name='logout'),
 #    path('api/', auth_views.LogoutView.as_view(template_name="users/api.html"), name='api'),
     path('rest_api/', include('API.urls')),
-    path('API/', include(router.urls))
+    path('API/', include(router.urls)),
+    path('', index.as_view()),
 ]
