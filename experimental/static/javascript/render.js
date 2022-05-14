@@ -263,7 +263,7 @@ const newPage = async (pageId) => {
 			}).catch(e => {
 				error = 1;
 			});
-			if (typeof resorts == "object" && resorts.length == 0) {
+			if (Array.isArray(resorts) && resorts.length == 0) {
 				error = 2;
 			}
 			if (error > 0) {
