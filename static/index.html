@@ -9,6 +9,7 @@
 	<script type="text/javascript" src="/javascript/render.js"></script>
 	<title>Snowcore</title>
 	<link rel="icon" type="image/x-icon" href="/favicon.ico">
+	<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
 	<script src="https://cdn.tailwindcss.com/3.0.24"></script>
 	<link href="https://fonts.googleapis.com/css?family=Work+Sans:200,400&display=swap" rel="stylesheet" />
 	<style>
@@ -30,9 +31,9 @@
 		}
 	</style>
 </html>
-<body class="bg-white text-gray-600 work-sans leading-normal text-base tracking-normal flex flex-col min-h-screen">
+<body class="bg-white text-gray-600 work-sans leading-normal text-base tracking-normal flex flex-col min-h-screen overscroll-contain">
 	<!--Nav-->
-	<nav id="header" class="w-full z-30 top-0 py-1 border-b-2">
+	<nav id="header" class="w-full z-30 top-0 py-1 border-b-2 fixed bg-white">
 		<div class="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 px-6 py-3">
 			<div class="hidden md:flex md:items-center md:w-auto w-full order-3 md:order-1" id="menu">
 			</div>
@@ -41,7 +42,7 @@
 					id="headerMain">SNOWCORE</a>
 			</div>
 			<div class="order-2 md:order-3 flex items-center" id="user">
-				<a class="inline-block no-underline hover:text-black" href="#">
+				<a class="inline-block no-underline hover:text-black">
 					<svg class="fill-current hover:text-black" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
 						viewBox="0 0 24 24">
 						<circle fill="none" cx="12" cy="7" r="3" />
@@ -52,16 +53,16 @@
 			</div>
 	</nav>
 	<!--Nav-->
-	<main id="main" class="flex-auto mb-6">
+	<main id="main" class="flex-auto mb-6 mt-16">
 		<h1 class="container mx-auto p-12 text-center select-none">Snowcore requires a compatible browser with JavaScript support to load.</h1>
 	</main>
 	<!--Footer-->
 	<footer class="container mx-auto bg-white border-t border-gray-400">
-		<div class="container flex px-3 pt-8 pb-4">
+		<div class="container flex px-3 py-4">
 			<div class="w-full mx-auto flex flex-wrap">
 				<div class="flex w-full">
-					<div class="px-3 md:px-0">
-						<h3 class="font-bold text-gray-900 select-none">&copy; Snowcore <script type="text/javascript">document.write(new Date().getFullYear());</script></h3>
+					<div class="px-3 md:px-0 w-full">
+						<h3 class="font-bold text-gray-900 select-none block text-center">&copy; Snowcore <script type="text/javascript">document.write(new Date().getFullYear());</script></h3>
 					</div>
 				</div>
 			</div>
