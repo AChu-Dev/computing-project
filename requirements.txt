@@ -2,6 +2,7 @@ django
 gunicorn
 django-heroku
 django-extensions
+djangorestframework
 requests
 python-dotenv
 whitenoise
