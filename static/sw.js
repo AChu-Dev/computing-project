@@ -1,19 +1,18 @@
 const staticSnowcore = "Snowcore-v0.1"
 const offline_url = "/offline.html";
-const prepend = "/";
 const assets = [
 	offline_url,
+	"/favicon.ico",
+	"/images/snowcore.png",
 	"https://fonts.googleapis.com/css?family=Work+Sans:200,400&display=swap",
 ]
 
 self.addEventListener("install", installEvent => {
-	console.log(installEvent);
 	installEvent.waitUntil(
 		caches.open(staticSnowcore).then(cache => {
 			return cache.addAll(assets);
 		})
 	);
-	console.log(caches);
 });
 
 self.addEventListener("activate", (event) => {
@@ -37,7 +36,6 @@ self.addEventListener('fetch', (event) => {
 				const networkResponse = await fetch(event.request);
 				return networkResponse;
 			} catch (error) {
-				console.error(error);
 				const cache = await caches.open(staticSnowcore);
 				const cachedResponse = await cache.match(offline_url);
 				return cachedResponse;
