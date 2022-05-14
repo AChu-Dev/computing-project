@@ -271,7 +271,7 @@ const newPage = async (pageId) => {
 				loader.classList.remove("cursor-wait");
 				loader.classList.remove("pb-12");
 				loader.classList.remove("pt-6");
-				addClasses(loader, ["pt-12", "pb-10"]);
+				addClasses(loader, ["pt-12", "pb-10", "px-8"]);
 				if (error == 1) {
 					loader.innerText = "An error occurred when attempting to load up the resorts.";
 				} else if (error == 2) {
@@ -306,8 +306,16 @@ window.addEventListener('DOMContentLoaded', () => {
 	}
 	let userState = 0;
 	document.getElementById("headerMain").addEventListener("click", () => {
-		pageId = 0;
-		newPage(pageId);
+		if (window.scrollY > 30) {
+			window.scroll({
+				top: 0, 
+				left: 0, 
+				behavior: "smooth" 
+			});
+		} else {
+			pageId = 0;
+			newPage(pageId);
+		}
 	});
 	document.getElementById("user").addEventListener("click", () => {
 		pageId = (userState + 1);
