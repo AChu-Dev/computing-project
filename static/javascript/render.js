@@ -306,8 +306,16 @@ window.addEventListener('DOMContentLoaded', () => {
 	}
 	let userState = 0;
 	document.getElementById("headerMain").addEventListener("click", () => {
-		pageId = 0;
-		newPage(pageId);
+		if (window.scrollY > 30) {
+			window.scroll({
+				top: 0, 
+				left: 0, 
+				behavior: "smooth" 
+			});
+		} else {
+			pageId = 0;
+			newPage(pageId);
+		}
 	});
 	document.getElementById("user").addEventListener("click", () => {
 		pageId = (userState + 1);
