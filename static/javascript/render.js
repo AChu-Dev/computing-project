@@ -347,8 +347,8 @@ const getResortByID = async (id) => {
 const getResorts = async () => {
 	let resorts = null;
 	if (!demo) {
-		const request = await fetch("/rest_api/resort/list", {
-			method: "POST",
+		const request = await fetch("/rest_api/resort/", {
+			method: "GET",
 			headers: {
 				"Accept": "application/json",
 				"Content-Type": "application/json"
