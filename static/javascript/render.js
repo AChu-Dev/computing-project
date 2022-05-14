@@ -271,7 +271,7 @@ const newPage = async (pageId) => {
 				loader.classList.remove("cursor-wait");
 				loader.classList.remove("pb-12");
 				loader.classList.remove("pt-6");
-				addClasses(loader, ["pt-12", "pb-10"]);
+				addClasses(loader, ["pt-12", "pb-10", "px-8"]);
 				if (error == 1) {
 					loader.innerText = "An error occurred when attempting to load up the resorts.";
 				} else if (error == 2) {
