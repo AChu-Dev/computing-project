@@ -59,7 +59,6 @@ const getWeather = async (resortId) => {
 			"Accept": "application/json"
 		},
 	}).then(response => response.json()).catch(e => {
-		console.error(e);
 		return null;
 	});
 	let updated = false;
@@ -158,8 +157,9 @@ const showResort = async (resortId) => {
 	let weather = await getWeather(resortId);
 	if (weather != null) {
 		weather = [weather["forecast"][0]["base"]["wx_desc"], weather["forecast"][0]["base"]["wx_icon"]];
+	} else {
+		weather = ["Unknown", null];
 	}
-	// 'resort_id','name','address','longitude','latitude', 'weather', 'wx_icon', 'description', 'favourites'
 	let image = resort["image"];
 	let name = resort["name"];
 	let weatherImage = weather[1];
@@ -170,12 +170,17 @@ const showResort = async (resortId) => {
 	const heroImage = document.createElement("div");
 	heroImage.style.backgroundImage = "url(" + (image || "/images/skiing.jpg") + ")";
 	addClasses(heroImage, ["container", "w-full", "mx-auto", "h-96", "bg-cover", "bg-center", "bg-no-repeat", "relative", "mb-12", "rounded-t-2xl", "mt-6", "select-none"]);
-	const weatherIcon = document.createElement("div");
-	addClasses(weatherIcon, ["w-24", "h-24", "rounded-full", "bg-white", "bg-no-repeat", "bg-contain", "bg-center", "mx-auto", "absolute", "inset-x-0", "select-none"]);
-	weatherIcon.style.bottom = "-48px";
-	weatherIcon.style.backgroundImage = "url(\"" + "/icons/" + weatherImage + "\")";
-	weatherIcon.title = "Current weather of resort: " + weather;
-	heroImage.append(weatherIcon);
+	if (weather == "Unknown") {
+		heroImage.classList.remove("h-96");
+		heroImage.style.height = "33rem";
+	} else {
+		const weatherIcon = document.createElement("div");
+		addClasses(weatherIcon, ["w-24", "h-24", "rounded-full", "bg-white", "bg-no-repeat", "bg-contain", "bg-center", "mx-auto", "absolute", "inset-x-0", "select-none"]);
+		weatherIcon.style.bottom = "-48px";
+		weatherIcon.style.backgroundImage = "url(\"" + "/icons/" + weatherImage + "\")";
+		weatherIcon.title = "Current weather of resort: " + weather;
+		heroImage.append(weatherIcon);
+	}
 	const containerFlex = document.createElement("div");
 	addClasses(containerFlex, ["flex", "items-center", "px-8", "mb-8", "justify-center", "select-none"]);
 	const resortName = document.createElement("h2");
