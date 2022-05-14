@@ -25,6 +25,7 @@ const loading = (clear) => {
 	main.innerHTML = "";
 	if (!clear) {
 		const loader = document.createElement("div");
+		loader.id = "loaderMessage";
 		addClasses(loader, ["container", "mx-auto", "text-center", "pb-12", "pt-6", "cursor-wait"]);
 		loader.innerText = "Loading...";
 		main.appendChild(loader);
@@ -241,12 +242,42 @@ const signIn = (register, usernameString = "") => {
 	main.appendChild(signInContainer);
 };
 
-const newPage = (pageId) => {
+const newPage = async (pageId) => {
 	loading(false);
 	switch (pageId) {
 		case 0:
 			document.title = "Snowcore";
-			showResorts([{ "id": 0, "name": "name", "image": null, "isFavourite": true }, { "id": 0, "name": "name", "image": null, "isFavourite": true }, { "id": 0, "name": "name", "image": null, "isFavourite": true }, { "id": 0, "name": "name", "image": null, "isFavourite": true }, { "id": 0, "name": "name", "image": null, "isFavourite": true }, { "id": 0, "name": "name", "image": null, "isFavourite": true }, { "id": 0, "name": "name", "image": null, "isFavourite": true }, { "id": 0, "name": "name", "image": null, "isFavourite": true }]);
+			let error = 0;
+			let resorts = null;
+			const request = await fetch("/rest_api/resort/list", {
+				method: 'POST',
+				headers: {
+					"Accept": "application/json",
+					"Content-Type": "application/json"
+				},
+				body: null
+			}).then(async r => {
+				resorts = await r.json();
+			}).catch(e => {
+				error = 1;
+			});
+			if (typeof resorts == "object" && resorts.length == 0) {
+				error = 2;
+			}
+			if (error > 0) {
+				const loader = document.getElementById("loaderMessage");
+				loader.classList.remove("cursor-wait");
+				loader.classList.remove("pb-12");
+				loader.classList.remove("pt-6");
+				addClasses(loader, ["pt-12", "pb-10"]);
+				if (error == 1) {
+					loader.innerText = "An error occurred when attempting to load up the resorts.";
+				} else if (error == 2) {
+					loader.innerText = "There are currently no resorts available to Snowcore users.";
+				}
+				break;
+			}
+			showResorts(resorts);
 			break;
 		case 1:
 			signIn(false);
