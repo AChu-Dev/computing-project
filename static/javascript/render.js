@@ -1,6 +1,6 @@
 "use strict";
 
-const prepend = "/";
+const demo = true;
 
 if ("serviceWorker" in navigator) {
 	window.addEventListener("load", () => {
@@ -13,9 +13,73 @@ if ("serviceWorker" in navigator) {
 
 let weather = null;
 
+let weatherCache = [new Date(0,0,0,0,0,0,0), []];
+
+const getWeather = async (resortId) => {
+	const urls = [
+		{
+			"id": 333031,
+			"url": "https://api.weatherunlocked.com/api/resortforecast/333031?app_id=a3fd6c9a&app_key=027a1023047a432b9ed2e4a7db484a07&hourly_interval=6"
+		},
+		{
+			"id": 333005,
+			"url": "https://api.weatherunlocked.com/api/resortforecast/333005?app_id=4c84c18d&app_key=5f4b7efa21bbda9d00d158c7c11ac815&hourly_interval=6"
+		},
+		{
+			"id": 333014,
+			"url": "http://api.weatherunlocked.com/api/resortforecast/333014?app_id=62707ed6&app_key=10981bcbfd38f7a0b53bb253990c0cbf&hourly_interval=6"
+		},
+	];
+	let url = null;
+	urls.forEach(resort => {
+		if (resort["id"] == resortId) {
+			url = resort["url"];
+			return;
+		}
+	});
+	if (url == null) {
+		return null;
+	}
+	let cached = null;
+	if ((new Date(new Date().getTime() - 60000)) < weatherCache[0]){
+		weatherCache[1].forEach(weatherCached => {
+			if (weatherCached["id"] == resortId) {
+				cached = weatherCached["weather"];
+				return cached;
+			}
+		});
+	}
+	if (cached != null) {
+		return cached;
+	}
+	const request = await fetch(url, {
+		method: "GET",
+		mode: "cors",
+		headers: {
+			"Accept": "application/json"
+		},
+	}).then(response => response.json()).catch(e => {
+		console.error(e);
+		return null;
+	});
+	let updated = false;
+	weatherCache[1].forEach(weatherCached => {
+		if (weatherCached["id"] == resortId) {
+			weatherCache["weather"] = request;
+			updated = true;
+			return request;
+		}
+	});
+	if (!updated) {
+		weatherCache[0] = new Date();
+		weatherCache[1].push({"id": resortId, "weather": request});
+	}
+	return request;
+}
+
 const historicalWeather = async () => {
 	if (weather == null)
-		weather = await fetch(prepend + "historical_weather.json").then(response => response.json());
+		weather = await fetch("/historical_weather.json").then(response => response.json());
 	return weather;
 };
 
@@ -42,14 +106,18 @@ const createResort = (id, name, image, isFavourite) => {
 	const container = document.createElement("div");
 	addClasses(container, ["w-full", "md:w-1/3", "xl:w-1/4", "p-6", "flex", "flex-col", "cursor-pointer"]);
 	const heroImage = document.createElement("img");
-	heroImage.src = image || prepend + "images/skiing.jpg";
+	heroImage.src = image || "/images/skiing.jpg";
 	addClasses(heroImage, ["hover:grow", "hover:shadow-lg", "h-64"]);
 	const containerFlex = document.createElement("div");
 	addClasses(containerFlex, ["pt-3", "flex", "items-center", "justify-between"]);
 	const resortName = document.createElement("p");
 	resortName.innerText = name;
 	const favourite = document.createElement("svg");
-	favourite.innerHTML = "<svg class=\"h-6 w-6 fill-current text-gray-500 hover:text-black\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z\" /></svg>";
+	if (isFavourite) {
+		favourite.innerHTML = "<svg class=\"h-6 w-6 fill-current text-gray-500 hover:text-black\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z\" /></svg>";
+	} else {
+		favourite.innerHTML = "<svg class=\"h-6 w-6 fill-current text-gray-500 hover:text-black\" width=\"24\" height=\"24\" xmlns=\"http://www.w3.org/2000/svg\" fill-rule=\"evenodd\" clip-rule=\"evenodd\"><path d=\"M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402m5.726-20.583c-2.203 0-4.446 1.042-5.726 3.238-1.285-2.206-3.522-3.248-5.719-3.248-3.183 0-6.281 2.187-6.281 6.191 0 4.661 5.571 9.429 12 15.809 6.43-6.38 12-11.148 12-15.809 0-4.011-3.095-6.181-6.274-6.181\"/></svg>";
+	}
 	heroImage.addEventListener("click", () => {
 		showResort(id);
 	});
@@ -79,22 +147,34 @@ const showResorts = async (resorts) => {
 	document.getElementById("main").appendChild(section);
 };
 
-const showResort = async (resort) => {
-	// 'resort_id','name','address','longitude','latitude', 'weather', 'wx_icon', 'description', 'favourites'
+const showResort = async (resortId) => {
 	loading(false);
-	let image = null;
-	let name = "Example";
-	let weatherImage = "Blizzard.gif";
-	let resortDescription = "example";
+	const resort = await getResortByID(resortId);
+	if (resort == null) {
+		pageId = 0;
+		newPage(pageId);
+		return;
+	}
+	let weather = await getWeather(resortId);
+	if (weather != null) {
+		weather = [weather["forecast"][0]["base"]["wx_desc"], weather["forecast"][0]["base"]["wx_icon"]];
+	}
+	// 'resort_id','name','address','longitude','latitude', 'weather', 'wx_icon', 'description', 'favourites'
+	let image = resort["image"];
+	let name = resort["name"];
+	let weatherImage = weather[1];
+	let resortDescription = resort["description"];
 	let totalFavourites = 0;
+	let isFavourite = resort["isFavourite"];
+	weather = weather[0];
 	const heroImage = document.createElement("div");
-	heroImage.style.backgroundImage = "url(" + (image || prepend + "images/skiing.jpg") + ")";
+	heroImage.style.backgroundImage = "url(" + (image || "/images/skiing.jpg") + ")";
 	addClasses(heroImage, ["container", "w-full", "mx-auto", "h-96", "bg-cover", "bg-center", "bg-no-repeat", "relative", "mb-12", "rounded-t-2xl", "mt-6", "select-none"]);
 	const weatherIcon = document.createElement("div");
 	addClasses(weatherIcon, ["w-24", "h-24", "rounded-full", "bg-white", "bg-no-repeat", "bg-contain", "bg-center", "mx-auto", "absolute", "inset-x-0", "select-none"]);
 	weatherIcon.style.bottom = "-48px";
-	weatherIcon.style.backgroundImage = "url(\"" + prepend + "icons/" + weatherImage + "\")";
-	weatherIcon.title = "Current weather of resort";
+	weatherIcon.style.backgroundImage = "url(\"" + "/icons/" + weatherImage + "\")";
+	weatherIcon.title = "Current weather of resort: " + weather;
 	heroImage.append(weatherIcon);
 	const containerFlex = document.createElement("div");
 	addClasses(containerFlex, ["flex", "items-center", "px-8", "mb-8", "justify-center", "select-none"]);
@@ -102,12 +182,18 @@ const showResort = async (resort) => {
 	resortName.innerText = name;
 	addClasses(resortName, ["container", "px-8", "text-center", "text-4xl", "pb-2", "mx-auto", "select-none"]);
 	const favourite = document.createElement("svg");
-	favourite.innerHTML = "<svg class=\"ml-2 h-6 w-6 fill-current text-gray-500 hover:text-black\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z\" /></svg>";
+	if (isFavourite) {
+		favourite.innerHTML = "<svg class=\"h-6 w-6 fill-current text-gray-500 hover:text-black ml-4\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z\" /></svg>";
+	} else {
+		favourite.innerHTML = "<svg class=\"h-6 w-6 fill-current text-gray-500 hover:text-black ml-4\" width=\"24\" height=\"24\" xmlns=\"http://www.w3.org/2000/svg\" fill-rule=\"evenodd\" clip-rule=\"evenodd\"><path d=\"M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402m5.726-20.583c-2.203 0-4.446 1.042-5.726 3.238-1.285-2.206-3.522-3.248-5.719-3.248-3.183 0-6.281 2.187-6.281 6.191 0 4.661 5.571 9.429 12 15.809 6.43-6.38 12-11.148 12-15.809 0-4.011-3.095-6.181-6.274-6.181\"/></svg>";
+	}
 	let descriptions = resortDescription.split("\n");
-	loading(true);
 	let mapLink = document.createElement("a");
 	addClasses(mapLink, ["px-8", "pb-6", "underline", "text-center", "text-blue-600", "hover:text-blue-800", "visited:text-purple-600", "container", "mx-auto", "w-full", "flex", "justify-center", "cursor-pointer", "select-none"]);
 	mapLink.innerText = "Piste map";
+	mapLink.href = "http://maps.google.com/maps?z=14&t=p&q=loc:" + resort["latitude"] + "+" + resort["longitude"];
+	mapLink.target = "_blank";
+	loading(true);
 	let main = document.getElementById("main");
 	main.appendChild(heroImage);
 	main.appendChild(resortName);
@@ -130,7 +216,7 @@ const showResort = async (resort) => {
 		top = false;
 	});
 	let historicWeather = document.createElement("img");
-	historicWeather.src = prepend + "historic_weather_2021.png";
+	historicWeather.src = "/historic_weather_2021.png";
 	addClasses(historicWeather, ["mx-auto", "select-none"]);
 	main.appendChild(historicWeather);
 	main.appendChild(mapLink);
@@ -176,7 +262,7 @@ const signIn = (register, usernameString = "") => {
 	const submit = document.createElement("input");
 	addClasses(submit, ["rounded-md", "block", "my-4", "p-2", "cursor-pointer", "bg-sky-500", "hover:bg-sky-700", "px-5", "py-2", "text-sm", "leading-5", "rounded-full", "font-semibold", "text-white", "mx-auto", "select-none"]);
 	submit.type = "submit";
-	submit.value = {true:"Register",false:"Sign in"}[register];
+	submit.value = { true: "Register", false: "Sign in" }[register];
 	if (register) {
 		document.title = "Sign up | Snowcore";
 		addClasses(tips[0], ["pt-12"]);
@@ -212,7 +298,7 @@ const signIn = (register, usernameString = "") => {
 	}
 	signInContainer.addEventListener("submit", async (e) => {
 		e.preventDefault();
-		let requestBody = {"username": username.value, password1: passwords[0].value, password2: passwords[1].value, firstName: names[0].value, lastName: names[1].value, email: email.value};
+		let requestBody = { "username": username.value, password1: passwords[0].value, password2: passwords[1].value, firstName: names[0].value, lastName: names[1].value, email: email.value };
 		if (!register) {
 			delete requestBody["password1"];
 			delete requestBody["password2"];
@@ -222,13 +308,13 @@ const signIn = (register, usernameString = "") => {
 			requestBody["password"] = passwords[0].value;
 		}
 		loading(false);
-		const request = await fetch("/rest_api/sign" + {true:"up",false:"in"}[register], {
-			method: 'POST',
+		const request = await fetch("/rest_api/sign" + { true: "up", false: "in" }[register], {
+			method: "POST",
 			headers: {
 				"Accept": "application/json",
 				"Content-Type": "application/json"
 			},
-			body: JSON.stringify({"username": username.value, password1: passwords[0].value, password2: passwords[1].value, firstName: names[0].value, lastName: names[1].value, email: email.value})
+			body: JSON.stringify({ "username": username.value, password1: passwords[0].value, password2: passwords[1].value, firstName: names[0].value, lastName: names[1].value, email: email.value })
 		}).catch(e => {
 			signIn(register, requestBody["username"]);
 			if (register) {
@@ -244,25 +330,60 @@ const signIn = (register, usernameString = "") => {
 	document.getElementById("main").appendChild(signInContainer);
 };
 
+const getResortByID = async (id) => {
+	const resorts = await getResorts();
+	if (resorts[1] != 0) {
+		return null;
+	}
+	for (let i = 0; i < resorts[0].length; i++) {
+		const resort = resorts[0][i];
+		if (resort["id"] == id) {
+			return resort;
+		}
+	}
+	return null;
+};
+
+const getResorts = async () => {
+	let resorts = null;
+	if (!demo) {
+		const request = await fetch("/rest_api/resort/list", {
+			method: "POST",
+			headers: {
+				"Accept": "application/json",
+				"Content-Type": "application/json"
+			},
+			body: null
+		}).then(async r => {
+			resorts = await r.json();
+		}).catch(e => {
+			resorts = 0;
+		});
+		if (typeof resorts == "number") {
+			return [null, 1];
+		}
+		if (Array.isArray(resorts) && resorts.length == 0) {
+			return [null, 2];
+		}
+	} else {
+		resorts = [{ id: 333031, name: "Saint Martin De Belleville", longitude: 6.504810, latitude: 45.379800, description: "The Alpine area of Saint-Martin-de-Belleville is known for its charming namesake village, with traditional stone-and-wood farmhouses, plus a handful of Savoyard restaurants and ski rental shops.", image: "/images/Saint-Martin-de-Belleville-ski-resort-French-Alps-1920.jpg" }, { id: 333005, name: "Courchevel", longitude: 6.637370, latitude: 45.434330, description: "Courchevel is a French Alps ski resort. It is a part of Les Trois Vallées, the largest linked ski areas in the world. Courchevel also refers to the towns of Courchevel 1300, Courchevel 1550, Courchevel 1650, and Courchevel 1850, which are named for their altitudes in metres.", image: "/images/courchevel.jpg" }, { id: 333014, name: "Meribel", longitude: 6.566170, latitude: 45.396549, description: "Méribel is a ski resort in the French Alps. Méribel refers to three neighbouring villages in the Les Allues commune of the Savoie department of France, near the town of Moûtiers, called Méribel Centre, Méribel-Mottaret and Méribel Village.", image: "/images/Meribel.png" }]
+	}
+	for (let i = 0; i < resorts.length; i++) {
+		resorts[i]["image"] = resorts[i]["image"] || "/images/skiing.jpg";
+		resorts[i]["isFavourite"] = false; // Call API
+	}
+	return [resorts, 0];
+};
+
 const newPage = async (pageId) => {
 	loading(false);
 	switch (pageId) {
 		case 0:
 			document.title = "Snowcore";
 			let error = 0;
-			let resorts = null;
-			const request = await fetch("/rest_api/resort/list", {
-				method: 'POST',
-				headers: {
-					"Accept": "application/json",
-					"Content-Type": "application/json"
-				},
-				body: null
-			}).then(async r => {
-				resorts = await r.json();
-			}).catch(e => {
-				error = 1;
-			});
+			let resorts = await getResorts();
+			error = resorts[1];
+			resorts = resorts[0];
 			if (Array.isArray(resorts) && resorts.length == 0) {
 				error = 2;
 			}
@@ -278,6 +399,10 @@ const newPage = async (pageId) => {
 					loader.innerText = "There are currently no resorts available to Snowcore users.";
 				}
 				break;
+			}
+			for (let i = 0; i < resorts.length; i++) {
+				resorts[i]["image"] = resorts[i]["image"] || "/images/skiing.jpg";
+				resorts[i]["isFavourite"] = false; // Call API
 			}
 			showResorts(resorts);
 			break;
@@ -308,9 +433,9 @@ window.addEventListener('DOMContentLoaded', () => {
 	document.getElementById("headerMain").addEventListener("click", () => {
 		if (window.scrollY > 30) {
 			window.scroll({
-				top: 0, 
-				left: 0, 
-				behavior: "smooth" 
+				top: 0,
+				left: 0,
+				behavior: "smooth"
 			});
 		} else {
 			pageId = 0;
