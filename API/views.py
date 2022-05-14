@@ -138,21 +138,21 @@ class ResortCreateView(APIView):
         serializer = ResortSerializer(resorts, many=True)
         return Response(serializer.data)
 
-    def post(self, req, format=None):
-        serializer = ResortSerializer(data=req.data)
+    def post(self, reqest, format=None):
+        serializer = ResortSerializer(data=reqest.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, req, pk, format=None):
+    def delete(self, reqest, pk, format=None):
         resort = self.get_object(pk)
         resort.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    def put(self, req, pk, format=None):
-        resort = req.get_object(pk)
-        serializer = ResortSerializer(resort, data=req.data)
+    def put(self, reqest, pk, format=None):
+        resort = reqest.get_object(pk)
+        serializer = ResortSerializer(resort, data=reqest.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
