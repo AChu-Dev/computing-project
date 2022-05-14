@@ -1,5 +1,5 @@
-
-from django.test import TestCase
+import unittest
+from django.test import Client
 import API.models
 from rest_framework import status 
 from rest_framework.test import APITestCase
@@ -9,37 +9,32 @@ import datetime
 logger = logging.getLogger(__name__)
 
 # Create your tests here.
-class userTests(TestCase):
-    @classmethod
+class userTests(unittest.TestCase):
     def setupTestObjects(self):
         logger.debug('Adding Users to DB for testing, DateTime:${}'.format(datetime.datetime.now()))
-        self.user1 = models.User(name='Test1', firstName='Test1_F',
-                lastName='Test1_S', email='test1@snowcore.org.uk', password='password')
-        self.user2 = models.User(name='Test2', firstName='Test2_F',
-                lastName='Test2_S', email='test2@snowcore.org.uk', password='password')
-        self.user3 = models.User(name='Test3', firstName='Test3_F',
-                lastName='Test3_S', email='test3@snowcore.org.uk', password='password')
+        for x in range (0, 3):
+            test_create_user(x)
 
     def test_list_users(self):
         logger.debug('Test(API Endpoint): LIST All Users')
         self.setupTestObjects()
         
-        response = self.client.post("127.0.0.1:8000/rest_api/user/list")
+        response = self.client.post("rest_api/user/list", follow=True)
         #logger.debug('Test(API Endpoint): LIST All Users, Response:${}, Status_Code:${}'.format(response.json(), response.status_code))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
     
-    def test_list_users(self):
+    def test_create_user(self, x):
         logger.debug('Test(API Endpoint): CREATE New User')
         
         data = {
-                'name':'Test4', 
-                'firstName':'Test4_F',
-                'lastName':'Test4_S',
-                'email':'test4@snowcore.org.uk',
+                'name':'Test{}'.format(x), 
+                'firstName':'Test{}_F'.format(x),
+                'lastName':'Test{}_S'.format(x),
+                'email':'test{}@snowcore.org.uk'.format(x),
                 'password':'password'
                 }
         
-        response = self.client.post("/rest_api/user/create", data,format='json')
+        response = self.client.post("/rest_api/user/create", data,format='json', follow=True)
         #logger.debug('Test(API Endpoint): CREATE New User, Response:${}, Status_Code:${}'.format(response.json(), response.status_code))
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         
