@@ -17,6 +17,7 @@ urlpatterns = [
         path('<int:pk>/resort/update/', views.resort_update_view),
         path('<int:pk>/resort/delete/', views.resort_delete_view),
         path('resort/list/', views.resort_list_view),
+        path("resort/", views.resort_api_view),
 
         path('favourite/create/', views.favourite_create_view),
         path('<int:pk>/favourite/detail/', views.favourite_detail_view),
@@ -29,8 +30,5 @@ urlpatterns = [
         path('signup/', views.signup),
         path('signin/', views.signin),
         path('signout/', views.signout),
-        # List of favourite resorts by user
-        # Number of favourties for a specific resort
-        # TESTING URLs
         path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
         ]

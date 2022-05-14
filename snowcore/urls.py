@@ -23,20 +23,10 @@ from users import views as user_views
 from rest_framework.routers import DefaultRouter
 from API.views import UserAPIViewSet, ResortAPIViewSet, FavouriteAPIViewSet
 
-router = DefaultRouter()
-router.register("User Router", UserAPIViewSet, basename="User API")
-router.register("Resort Router", ResortAPIViewSet, basename="Resort API")
-router.register("Favourite Router", FavouriteAPIViewSet, basename="Resort API")
-
 class index(RedirectView): url = "/index.html"
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-#    path('register/', user_views.register, name='register'),
-#    path('login/', auth_views.LoginView.as_view(template_name="users/login.html"), name='login'),
-#    path('logout/', auth_views.LogoutView.as_view(template_name="users/logout.html"), name='logout'),
-#    path('api/', auth_views.LogoutView.as_view(template_name="users/api.html"), name='api'),
     path('rest_api/', include('API.urls')),
-    path('API/', include(router.urls)),
     path('', index.as_view()),
 ]

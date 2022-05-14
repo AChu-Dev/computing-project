@@ -11,6 +11,10 @@ from django.views.generic.detail import SingleObjectMixin
 from django.views import View
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.http import Http404
 # Create your views here.
 
 
@@ -102,7 +106,7 @@ class UserDeleteView(generics.DestroyAPIView):
     lookup_field = 'pk'
 
     def delete_view(self, serializer):
-        instance = serializer.save()
+        instance = serializer.delete()
 
 
 user_delete_view = UserDeleteView.as_view()
@@ -122,7 +126,43 @@ class ResortViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
-class ResortCreateView(generics.CreateAPIView):
+class ResortCreateView(APIView):
+    def get_object(self, pk):
+        try:
+            return Resort.objects.get(pk=pk)
+        except Resort.DoesNotExist:
+            raise Http404
+
+    def get(self, request, format=None):
+        resorts = Resort.objects.all()
+        serializer = ResortSerializer(resorts, many=True)
+        return Response(serializer.data)
+
+    def post(self, req, format=None):
+        serializer = ResortSerializer(data=req.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, req, pk, format=None):
+        resort = self.get_object(pk)
+        resort.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def put(self, req, pk, format=None):
+        resort = req.get_object(pk)
+        serializer = ResortSerializer(resort, data=req.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+resort_api_view = ResortCreateView.as_view()
+
+
+class ResortCreateViewOld(generics.CreateAPIView):
     queryset = Resort.objects.all().order_by('name')
     serializer_class = ResortSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -135,7 +175,7 @@ class ResortCreateView(generics.CreateAPIView):
      #   seralizer.save()
 
 
-resort_create_view = ResortCreateView.as_view()
+resort_create_view = ResortCreateViewOld.as_view()
 
 
 class ResortDetailView(generics.RetrieveAPIView):
