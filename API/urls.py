@@ -8,12 +8,12 @@ urlpatterns = [
 
         path("duser/list/", views.duser_list_view),
         path("duser/list/<int:pk>/", views.duser_detail_view),
-        path("duser/create2/", views.create_user_django),
+        path("duser/create/", views.create_user_django),
 
         path("resort/", views.resort_api_view),
         path("resort/<int:pk>/", views.resort_api_id_view),
 
-        path("favourite/create/", views.favourite_create_view),
+        path("favourite/", views.favourite_create_view),
         path('favourite/detail/<int:pk>/', views.favourite_detail_view),
         path('favourite/list/', views.favourite_list_view),
         path('favourite/list/user/', views.favourite_list_user),
