@@ -283,6 +283,33 @@ class FavouriteCreateView(APIView):
 
 favourite_create_view = FavouriteCreateView.as_view()
 
+
+class CreateUserDjango(APIView):
+    def get(self, request, format=None):
+        users = models.User.objects.all()
+        serializer = DjangoUserSerializer(users, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        data = request.data
+
+        username = data.get("username", None)
+        password = data.get("password", None)
+        user = authenticate(username=username, password=password)
+
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+                return Response(status = status.HTTP_200_OK)
+            else:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+create_user_django = CreateUserDjango.as_view()
+
+
 class CreateUserDjango(APIView):
     def get(self, request, format=None):
         users = models.User.objects.all()
@@ -297,13 +324,7 @@ class CreateUserDjango(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-#    model = get_user_model()
-#    permissions = [permissions.AllowAny]
-#    serializer_class = DjangoUserSerializer
-
-
-create_user_django = CreateUserDjango.as_view()
+create_user_django2 = CreateUserDjango.as_view()
 
 
 @api_view(["POST"])
