@@ -93,13 +93,13 @@ class ResortDetailDeleteUpdateView(APIView):
         serializer = ResortSerializer(resort)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def delete(self, reqest, pk, format=None):
+    def delete(self, request, pk, format=None):
         resort = self.get_object(pk)
         resort.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def put(self, request, pk, format=None):
-        resort = self.request.get_object(pk)
+        resort = self.get_object(pk)
         serializer = ResortSerializer(resort, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -146,7 +146,7 @@ class FavouriteDetailDeleteUpdateView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def put(self, request, pk, format=None):
-        fav = self.request.get_object(pk)
+        fav = self.get_object(pk)
         serializer = FavouriteSerializer(fav, data=request.data)
         if serializer.is_valid():
             serializer.save()
