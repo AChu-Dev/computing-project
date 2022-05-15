@@ -1,6 +1,6 @@
 import requests
 
-datav2 = {'name': ['Three Valleys'], 'address': ['France'], 'longitude': ['-50.32'], 'latitude': ['32.2'], 'description': ['This is a nice palce']}
+datav2 = {'name': ['Three Valleys'], 'address': ['France'], 'longitude': ['-50.32'], 'latitude': ['32.2'], 'description': ['This is a nice palce'], "image": ["static/img.png"]}
 response = requests.post("http://127.0.0.1:8000/rest_api/resort/", data = datav2)
 print(response)
 print(response.json())
