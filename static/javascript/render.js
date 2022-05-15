@@ -20,15 +20,15 @@ const weatherInterval = 6;
 const getWeather = async (resortId) => {
 	const urls = [
 		{
-			"id": 333031,
+			"id": 1,
 			"url": "https://api.weatherunlocked.com/api/resortforecast/333031?app_id=a3fd6c9a&app_key=027a1023047a432b9ed2e4a7db484a07&hourly_interval=" + weatherInterval
 		},
 		{
-			"id": 333005,
+			"id": 2,
 			"url": "https://api.weatherunlocked.com/api/resortforecast/333005?app_id=4c84c18d&app_key=5f4b7efa21bbda9d00d158c7c11ac815&hourly_interval=" + weatherInterval
 		},
 		{
-			"id": 333014,
+			"id": 3,
 			"url": "https://api.weatherunlocked.com/api/resortforecast/333014?app_id=62707ed6&app_key=10981bcbfd38f7a0b53bb253990c0cbf&hourly_interval=" + weatherInterval
 		},
 	];
@@ -141,7 +141,7 @@ const showResorts = async (resorts) => {
 	const container = document.createElement("div");
 	addClasses(container, ["container", "mx-auto", "flex", "items-center", "flex-wrap", "pt-4", "pb-12"]);
 	resorts.forEach(resort => {
-		let test = createResort(resort["id"], resort["name"], resort["image"], resort["isFavourite"]);
+		let test = createResort(resort["pk"], resort["name"], resort["image"], resort["isFavourite"]);
 		container.appendChild(test);
 	});
 	section.innerHTML = "";
@@ -356,7 +356,7 @@ const getResortByID = async (id) => {
 	}
 	for (let i = 0; i < resorts[0].length; i++) {
 		const resort = resorts[0][i];
-		if (resort["id"] == id) {
+		if (resort["pk"] == id) {
 			return resort;
 		}
 	}
