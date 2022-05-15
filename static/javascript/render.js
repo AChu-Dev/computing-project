@@ -11,6 +11,8 @@ if ("serviceWorker" in navigator) {
 	})
 }
 
+let user = { id: null, admin: false };
+
 let weather = null;
 
 let weatherCache = [new Date(0, 0, 0, 0, 0, 0, 0), []];
@@ -46,6 +48,19 @@ const getWeather = async (resortId) => {
 	if ((new Date(new Date().getTime() - 60000)) < weatherCache[0]) {
 		weatherCache[1].forEach(weatherCached => {
 			if (weatherCached["id"] == resortId) {
+				const currentDate = ("0" + new Date().getDate()).slice(-2) + "/" + ("0" + (new Date().getMonth() + 1)).slice(-2) + "/" + new Date().getFullYear();
+				const currentTime = new Date(0,0,0,new Date().getHours(),new Date().getMinutes(),0,0);
+				while (weatherCached["weather"]["forecast"][0]["date"] == currentDate) {
+					const weatherTime = new Date(0,0,0,weatherCached["weather"]["forecast"][0]["time"].split(":")[0],weatherCached["weather"]["forecast"][0]["time"].split(":")[1],0,0);
+					if (currentTime > weatherTime) {
+						weatherCached["weather"]["forecast"].shift();
+					} else {
+						break;
+					}
+				}
+				if (weatherCached["weather"]["forecast"].length < 10) {
+					return;
+				}
 				cached = weatherCached["weather"];
 				return cached;
 			}
@@ -84,6 +99,15 @@ const historicalWeather = async () => {
 	return weather;
 };
 
+const userSignedIn = () => {
+	const userIcon = document.getElementById("user");
+	if (user["id"] !== null) {
+		userIcon.title = "Menu";
+	} else {
+		userIcon.title = "Sign in";
+	}
+}
+
 const loading = (clear, append = false) => {
 	let main = document.getElementById("main");
 	addClasses(main, ["mb-6", "flex-auto"]);
@@ -115,6 +139,9 @@ const createResort = (id, name, image, isFavourite) => {
 	addClasses(containerFlex, ["pt-3", "flex", "items-center", "justify-between"]);
 	const resortName = document.createElement("p");
 	resortName.innerText = name;
+	addClasses(resortName, ["text-ellipsis", "overflow-hidden"]);
+	resortName.style.lineHeight = "2ch";
+	resortName.style.maxHeight = "2ch";
 	const favourite = document.createElement("svg");
 	if (isFavourite) {
 		favourite.innerHTML = "<svg class=\"h-6 w-6 fill-current text-gray-500 hover:text-black\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z\" /></svg>";
@@ -131,6 +158,7 @@ const createResort = (id, name, image, isFavourite) => {
 	containerFlex.appendChild(favourite);
 	container.appendChild(heroImage);
 	container.appendChild(containerFlex);
+	container.title = "View " + name;
 	return container;
 };
 
@@ -242,98 +270,74 @@ const showResort = async (resortId) => {
 	document.title = name + " | Snowcore";
 };
 
-const signIn = (register, usernameString = "") => {
+const signIn = (register, emailString = "") => {
 	const signInContainer = document.createElement("form");
 	addClasses(signInContainer, ["container", "w-full", "mx-auto"]);
-	const names = [document.createElement("input"), document.createElement("input")];
 	const email = document.createElement("input");
-	const username = document.createElement("input");
-	username.value = usernameString;
+	email.value = emailString;
 	const passwords = [document.createElement("input"), document.createElement("input")];
-	addClasses(names[0], ["rounded-md", "border-black", "border", "block", "mx-auto", "px-2", "w-64"]);
-	addClasses(names[1], ["rounded-md", "border-black", "border", "block", "mx-auto", "px-2", "w-64"]);
 	addClasses(email, ["rounded-md", "border-black", "border", "block", "mx-auto", "px-2", "w-64"]);
-	addClasses(username, ["rounded-md", "border-black", "border", "block", "mx-auto", "px-2", "w-64"]);
 	addClasses(passwords[0], ["rounded-md", "border-black", "border", "block", "mx-auto", "px-2", "w-64"]);
 	addClasses(passwords[1], ["rounded-md", "border-black", "border", "block", "mx-auto", "px-2", "w-64"]);
-	names[0].setAttribute("required", "required");
-	names[1].setAttribute("required", "required");
 	email.setAttribute("required", "required");
-	username.setAttribute("required", "required");
 	passwords[0].setAttribute("required", "required");
 	passwords[1].setAttribute("required", "required");
 	email.type = "email";
 	passwords[0].type = "password";
 	passwords[1].type = "password";
-	const tips = [document.createElement("p"), document.createElement("p"), document.createElement("p"), document.createElement("p"), document.createElement("p"), document.createElement("p")];
-	tips[0].innerText = "First name:";
-	addClasses(tips[0], ["block", "text-center", "select-none"]);
-	tips[1].innerText = "Surname:";
+	const tips = [document.createElement("p"), document.createElement("p"), document.createElement("p")];
+	tips[0].innerText = "Email:";
+	addClasses(tips[0], ["block", "text-center", "select-none", "pt-12"]);
+	tips[1].innerText = "Password:";
 	addClasses(tips[1], ["block", "text-center", "select-none"]);
-	tips[2].innerText = "Email:";
+	tips[2].innerText = "Repeat password:";
 	addClasses(tips[2], ["block", "text-center", "select-none"]);
-	tips[3].innerText = "Username:";
-	addClasses(tips[3], ["block", "text-center", "select-none"]);
-	tips[4].innerText = "Password:";
-	addClasses(tips[4], ["block", "text-center", "select-none"]);
-	tips[5].innerText = "Repeat password:";
-	addClasses(tips[5], ["block", "text-center", "select-none"]);
 	const submit = document.createElement("input");
-	addClasses(submit, ["rounded-md", "block", "my-4", "p-2", "cursor-pointer", "bg-sky-500", "hover:bg-sky-700", "px-5", "py-2", "text-sm", "leading-5", "rounded-full", "font-semibold", "text-white", "mx-auto", "select-none"]);
+	addClasses(submit, ["rounded-md", "block", "my-4", "p-2", "cursor-pointer", "bg-sky-500", "hover:bg-sky-700", "px-5", "py-2", "text-sm", "leading-5", "rounded-full", "font-semibold", "text-white", "mx-auto", "w-64", "select-none"]);
 	submit.type = "submit";
 	submit.value = { true: "Register", false: "Sign in" }[register];
+	signInContainer.appendChild(tips[0]);
+	signInContainer.appendChild(email);
+	signInContainer.appendChild(tips[1]);
+	signInContainer.appendChild(passwords[0]);
 	if (register) {
 		document.title = "Sign up | Snowcore";
-		addClasses(tips[0], ["pt-12"]);
-		signInContainer.appendChild(tips[0]);
-		signInContainer.appendChild(names[0]);
-		signInContainer.appendChild(tips[1]);
-		signInContainer.appendChild(names[1]);
 		signInContainer.appendChild(tips[2]);
-		signInContainer.appendChild(email);
-		signInContainer.appendChild(tips[3]);
-		signInContainer.appendChild(username);
-		signInContainer.appendChild(tips[4]);
-		signInContainer.appendChild(passwords[0]);
-		signInContainer.appendChild(tips[5]);
 		signInContainer.appendChild(passwords[1]);
 		signInContainer.appendChild(submit);
 	} else {
 		document.title = "Sign in | Snowcore";
-		addClasses(tips[3], ["pt-12"]);
-		signInContainer.appendChild(tips[3]);
-		signInContainer.appendChild(username);
-		signInContainer.appendChild(tips[4]);
-		signInContainer.appendChild(passwords[0]);
 		signInContainer.appendChild(submit);
 		const register = document.createElement("input");
-		addClasses(register, ["rounded-md", "block", "my-4", "p-2", "cursor-pointer", "bg-sky-500", "hover:bg-sky-700", "px-5", "py-2", "text-sm", "leading-5", "rounded-full", "font-semibold", "text-white", "mx-auto", "select-none"]);
+		addClasses(register, ["rounded-md", "block", "my-4", "p-2", "cursor-pointer", "bg-sky-500", "hover:bg-sky-700", "px-5", "py-2", "text-sm", "leading-5", "rounded-full", "font-semibold", "text-white", "mx-auto", "w-64", "select-none"]);
 		register.type = "button";
 		register.value = "Register?";
 		register.addEventListener("click", () => {
-			signIn(true, username.value);
+			signIn(true, email.value);
 		});
 		signInContainer.appendChild(register);
 	}
 	signInContainer.addEventListener("submit", async (e) => {
 		e.preventDefault();
-		let requestBody = { "username": username.value, password1: passwords[0].value, password2: passwords[1].value, firstName: names[0].value, lastName: names[1].value, email: email.value };
-		if (!register) {
-			delete requestBody["password1"];
-			delete requestBody["password2"];
-			delete requestBody["firstName"];
-			delete requestBody["lastName"];
-			delete requestBody["email"];
-			requestBody["password"] = passwords[0].value;
+		let requestBody = { password: passwords[0].value, username: email.value };
+		if (!(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value))) {
+			alert("That email address is invalid!");
+			return;
+		}
+		if (register) {
+			if (passwords[0].value != passwords[1].value || passwords[0].value.length == 0) {
+				alert("Please make sure both passwords match and are not blank.");
+				return;
+			}
 		}
 		loading(false);
-		const request = await fetch("/rest_api/sign" + { true: "up", false: "in" }[register], {
+		const request = await fetch("/rest_api/duser/create2/", {
 			method: "POST",
 			headers: {
 				"Accept": "application/json",
 				"Content-Type": "application/json"
 			},
-			body: JSON.stringify({ "username": username.value, password1: passwords[0].value, password2: passwords[1].value, firstName: names[0].value, lastName: names[1].value, email: email.value })
+			body: JSON.stringify(requestBody)
 		}).catch(e => {
 			signIn(register, requestBody["username"]);
 			if (register) {
@@ -343,7 +347,20 @@ const signIn = (register, usernameString = "") => {
 			}
 		});
 		const content = await request.json();
-		console.log(content);
+		if ("id" in content) {
+			user["id"] = content["id"];
+			pageId = 0;
+			newPage(pageId);
+			return;
+		} else if ("username" in content) {
+			alert(content["username"]);
+		} else if (register){
+			alert("Failed to create user!");
+		} else {
+			alert("Failed to sign in, please check your credentials!");
+		}
+		loading(true);
+		newPage(pageId);
 	});
 	loading(true);
 	document.getElementById("main").appendChild(signInContainer);
@@ -402,7 +419,7 @@ const createNewResort = async (update, name, description, longitude, latitude, i
 			"Accept": "application/json",
 			"Content-Type": "application/json"
 		},
-		body: JSON.stringify({ "name": name, "description": description, "longitude": longitude, "latitude": latitude, "image": image})
+		body: JSON.stringify({ "name": name, "description": description, "longitude": longitude, "latitude": latitude, "image": image })
 	}).catch(e => {
 		console.error(e);
 		error = true;
@@ -446,7 +463,7 @@ const createNewResortPage = () => {
 	tips[3].innerText = "Description:";
 	addClasses(tips[3], ["block", "text-center", "select-none"]);
 	const submit = document.createElement("input");
-	addClasses(submit, ["rounded-md", "block", "my-4", "p-2", "cursor-pointer", "bg-sky-500", "hover:bg-sky-700", "px-5", "py-2", "text-sm", "leading-5", "rounded-full", "font-semibold", "text-white", "mx-auto", "select-none"]);
+	addClasses(submit, ["rounded-md", "block", "my-4", "p-2", "cursor-pointer", "bg-sky-500", "hover:bg-sky-700", "px-5", "py-2", "text-sm", "leading-5", "rounded-full", "font-semibold", "text-white", "mx-auto", "w-64", "select-none"]);
 	submit.type = "submit";
 	submit.value = "Create resort";
 	addClasses(tips[0], ["pt-12"]);
@@ -479,6 +496,51 @@ const createNewResortPage = () => {
 	loading(true);
 	let main = document.getElementById("main");
 	main.appendChild(createResortContainer);
+};
+
+const userMenu = (admin) => {
+	loading(false);
+	const links = [document.createElement("button"), document.createElement("button"), document.createElement("button"), document.createElement("button"), document.createElement("button")];
+	links[0].innerText = "Create resort";
+	links[0].addEventListener("click", () => {
+		pageId = 3;
+		newPage(pageId);
+	});
+	links[1].innerText = "List of users";
+	links[1].addEventListener("click", () => {
+		pageId = 5;
+		newPage(pageId);
+	});
+	links[2].innerText = "List of favourites";
+	links[2].addEventListener("click", () => {
+		pageId = 6;
+		newPage(pageId);
+	});
+	links[3].innerText = "Resorts";
+	links[3].addEventListener("click", () => {
+		pageId = 0;
+		newPage(pageId);
+	});
+	links[4].innerText = "Sign out";
+	links[4].addEventListener("click", () => {
+		loading(false);
+		user["id"] = null;
+		user["admin"] = false;
+		pageId = 0;
+		newPage(pageId);
+	});
+	if (!admin) {
+		admin = 3;
+	} else {
+		admin = 0;
+	}
+	loading(true);
+	let main = document.getElementById("main");
+	for (let i = admin; i < 5; i++) {
+		addClasses(links[i], ["rounded-md", "block", "my-4", "p-2", "cursor-pointer", "bg-sky-500", "hover:bg-sky-700", "px-5", "py-2", "text-sm", "leading-5", "rounded-full", "font-semibold", "text-white", "w-64", "mx-auto", "select-none"]);
+		main.appendChild(links[i]);
+	}
+	document.title = "Menu | Snowcore";
 };
 
 const newPage = async (pageId) => {
@@ -516,7 +578,17 @@ const newPage = async (pageId) => {
 			signIn(false);
 			break;
 		case 2:
-			signIn(true);
+			userMenu(user["admin"] || false);
+			break;
+		case 3:
+			createNewResortPage(false);
+			break;
+		case 4:
+			createNewResortPage(false);
+			break;
+		case 5:
+			break;
+		case 6:
 			break;
 		default:
 			const loader = document.getElementById("loaderMessage");
@@ -529,13 +601,12 @@ const newPage = async (pageId) => {
 	}
 };
 
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
 	if (typeof pageId === "undefined") {
 		console.error("Invalid page ID");
 	} else {
 		newPage(pageId);
 	}
-	let userState = 0;
 	document.getElementById("headerMain").addEventListener("click", () => {
 		if (window.scrollY > 30) {
 			window.scroll({
@@ -549,7 +620,12 @@ window.addEventListener('DOMContentLoaded', () => {
 		}
 	});
 	document.getElementById("user").addEventListener("click", () => {
-		pageId = (userState + 1);
+		if (user["id"] === null) {
+			pageId = 1;
+		} else {
+			pageId = 2;
+		}
 		newPage(pageId);
 	});
+	userSignedIn();
 });
