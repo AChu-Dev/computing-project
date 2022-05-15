@@ -100,6 +100,8 @@ CORS_ALLOW_METHODS = (
         'OPTIONS'
         )
 
+APPEND_SLASH = False
+
 STATICFILES_DIRS = [
 #    BASE_DIR / "staticfiles"
 ]
