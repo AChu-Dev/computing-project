@@ -31,6 +31,14 @@ class CreateUserDjango(APIView):
 create_user_django = CreateUserDjango.as_view()
 
 
+class LoginUserDjango(APIView):
+    def get(self):
+        return Response(status=status.HTTP_200_OK)
+
+    def post(self, request, format=None):
+        pass
+
+
 class DUserList(generics.ListAPIView):
     queryset = models.User.objects.all()
     serializer_class = DjangoUserSerializer
@@ -85,14 +93,14 @@ class ResortDetailDeleteUpdateView(APIView):
         serializer = ResortSerializer(resort)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def delete(self, reqest, pk, format=None):
+    def delete(self, request, pk, format=None):
         resort = self.get_object(pk)
         resort.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    def put(self, reqest, pk, format=None):
-        resort = reqest.get_object(pk)
-        serializer = ResortSerializer(resort, data=reqest.data)
+    def put(self, request, pk, format=None):
+        resort = self.get_object(pk)
+        serializer = ResortSerializer(resort, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
@@ -104,6 +112,10 @@ resort_api_id_view = ResortDetailDeleteUpdateView.as_view()
 
 # Favourite
 class FavouriteCreateView(APIView):
+    def get(self, request, format=None):
+        fav = Favourite.objects.all()
+        serializer = FavouriteSerializer(fav, many=True)
+        return Response(serializer.data)
 
     def post(self, request, format=None):
         serializer = FavouriteSerializer(data=request.data)
@@ -128,14 +140,14 @@ class FavouriteDetailDeleteUpdateView(APIView):
         serializer = FavouriteSerializer(fav)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def delete(self, reqest, pk, format=None):
+    def delete(self, request, pk, format=None):
         fav = self.get_object(pk)
         fav.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    def put(self, reqest, pk, format=None):
-        fav = reqest.get_object(pk)
-        serializer = FavouriteSerializer(fav, data=reqest.data)
+    def put(self, request, pk, format=None):
+        fav = self.get_object(pk)
+        serializer = FavouriteSerializer(fav, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
