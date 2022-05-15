@@ -12,36 +12,17 @@
 	<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
 	<script src="https://cdn.tailwindcss.com/3.0.24"></script>
 	<link href="https://fonts.googleapis.com/css?family=Work+Sans:200,400&display=swap" rel="stylesheet" />
-	<style>
-		.work-sans {
-			font-family: "Work Sans", sans-serif;
-		}
-
-		#menu-toggle:checked+#menu {
-			display: block;
-		}
-
-		.hover\:grow {
-			transition: all 0.3s;
-			transform: scale(1);
-		}
-
-		.hover\:grow:hover {
-			transform: scale(1.02);
-		}
-	</style>
+	<style>body{font-family:"Work Sans",sans-serif}</style>
 </html>
-<body class="bg-white text-gray-600 work-sans leading-normal text-base tracking-normal flex flex-col min-h-screen overscroll-contain">
+<body class="bg-white text-gray-600 leading-normal text-base tracking-normal flex flex-col min-h-screen overscroll-contain">
 	<!--Nav-->
 	<nav id="header" class="w-full z-30 top-0 py-1 border-b-2 fixed bg-white">
-		<div class="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 px-6 py-3">
-			<div class="hidden md:flex md:items-center md:w-auto w-full order-3 md:order-1" id="menu">
-			</div>
-			<div class="order-1 md:order-2">
+		<div class="w-full container mx-auto flex flex-wrap justify-between mt-0 px-6 py-3">
+			<div>
 				<a class="flex items-center tracking-wide no-underline hover:no-underline font-bold text-gray-800 text-xl cursor-pointer select-none"
 					id="headerMain">SNOWCORE</a>
 			</div>
-			<div class="order-2 md:order-3 flex items-center" id="user">
+			<div class="flex items-center" id="user">
 				<a class="inline-block no-underline hover:text-black cursor-pointer">
 					<svg class="fill-current hover:text-black" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
 						viewBox="0 0 24 24">
