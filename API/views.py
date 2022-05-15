@@ -12,7 +12,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404
-from django.contrib.auth import models
+from django.contrib.auth import models, get_user_model
+from django.contrib.auth.forms import UserCreationForm
 # Create your views here.
 
 
@@ -34,6 +35,7 @@ class DUserDetail(generics.RetrieveAPIView):
 duser_detail_view = DUserList.as_view()
 
 # USER VIEWS OLD
+
 
 class UserCreateView(generics.CreateAPIView):
     queryset = User.objects.all().order_by('firstName')
@@ -269,6 +271,41 @@ class FavouriteListByResort(generics.ListAPIView):
 favourite_list_resort = FavouriteListByResort.as_view()
 
 
+class FavouriteCreateView(APIView):
+
+    def post(self, request, format=None):
+        serializer = FavouriteSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+favourite_create_view = FavouriteCreateView.as_view()
+
+class CreateUserDjango(APIView):
+    def get(self, request, format=None):
+        users = models.User.objects.all()
+        serializer = DjangoUserSerializer(users, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        serializer = DjangoUserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+#    model = get_user_model()
+#    permissions = [permissions.AllowAny]
+#    serializer_class = DjangoUserSerializer
+
+
+create_user_django = CreateUserDjango.as_view()
+
+
 @api_view(["POST"])
 def signup(request):
     username = request.POST['username']
@@ -279,23 +316,23 @@ def signup(request):
     password2 = request.POST['password2']
 
     if User.objects.filter(username=username):
-        messages.error(request, "Username already exist! Please try some other username.")
-        return HttpResponse("userExists")
+        message = messages.error(request, "Username already exist! Please try some other username.")
+        return Response(message, status = status.HTTP_400_BAD_REQUEST)
 
     elif User.objects.filter(email=email).exists():
-        messages.error(request, "Email Already Registered!!")
-        return HttpResponse("emailExists")
+        message = messages.error(request, "Email Already Registered!!")
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
     elif password1 != password2:
-        messages.error(request, "Passwords didn't matched!!")
-        return HttpResponse("passwordNotTheSame")
+        message = messages.error(request, "Passwords didn't matched!!")
+        return Response(message, status = status.HTTP_400_BAD_REQUEST)
 
     newUser = User.objects.create_user(username, email, password1)
     newUser.first_name = firstName
     newUser.last_name = lastName
     newUser.is_active = False
     newUser.save()
-    return HttpResponse("success")
+    return Response(status=status.HTTP_201_CREATED)
 
 
 @api_view(["POST"])
@@ -308,9 +345,9 @@ def signin(request):
     if auth is not None:
         login(request, auth)
         firstName = auth.first_name
-        return HttpResponse("success")
+        return Response("success", status = status.HTTP_201_CREATED)
     else:
-        return HttpResponse("fail")
+        return HttpResponse("fail", status = status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["POST"])

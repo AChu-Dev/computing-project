@@ -1,7 +1,9 @@
 from rest_framework import serializers
 from .models import User, Resort, Favourite
-from django.contrib.auth import models
+from django.contrib.auth import models, get_user_model
 
+
+UserModel = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -24,10 +26,22 @@ class DjangoUserSerializerInfo(serializers.ModelSerializer):
 
 
 class DjangoUserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
+    def create(self, validated_data):
+        user = UserModel.objects.create_user(
+                username = validated_data["username"],
+                password = validated_data["password"],
+                )
+        return user
+
     class Meta:
-        model = models.User
-        fields = ["id", "username", "first_name", "last_name", "email",
-                "password"]
+        model = UserModel
+        fields = (
+                "id",
+                "username",
+                "password",
+                )
 
 
 class ResortSerializer(serializers.ModelSerializer):

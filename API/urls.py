@@ -8,7 +8,7 @@ urlpatterns = [
 
         path("duser/list/", views.duser_list_view),
         path("duser/list/<int:pk>/", views.duser_detail_view),
-
+        path("duser/create/", views.create_user_django),
 
         path('user/list/', views.user_list_view),
         path('user/create/', views.user_create_view),
