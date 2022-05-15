@@ -25,8 +25,8 @@ class User(models.Model):
 
 class Resort(models.Model):
     name = models.CharField(max_length=48)
-    longitude = models.DecimalField(max_digits=7, decimal_places=5)
-    latitude = models.DecimalField(max_digits=7, decimal_places=5)
+    longitude = models.DecimalField(max_digits=9, decimal_places=5)
+    latitude = models.DecimalField(max_digits=9, decimal_places=5)
     description = models.CharField(max_length=1024)
     image = models.CharField(max_length=1024, null=True, blank=True)
 

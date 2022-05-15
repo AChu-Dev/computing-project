@@ -1,9 +1,6 @@
-from django.shortcuts import render
 from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-import json
-from django.http import JsonResponse
 from rest_framework import viewsets, generics, authentication, permissions
 from .seralizer import UserSerializer, ResortSerializer, FavouriteSerializer, DjangoUserSerializer, DjangoUserSerializerInfo
 from .models import User, Resort, Favourite
@@ -270,38 +267,6 @@ class FavouriteListByResort(generics.ListAPIView):
 
 
 favourite_list_resort = FavouriteListByResort.as_view()
-
-
-class FavouriteDeleteView(generics.DestroyAPIView):
-    queryset = Favourite.objects.all()
-    serializer_class = FavouriteSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    lookup_field = 'pk'
-
-    def delete_view(self, serializer):
-        instance = serializer.save()
-
-
-favourite_delete_view = FavouriteDeleteView.as_view()
-
-
-class FavouriteUpdateView(generics.UpdateAPIView):
-    queryset = Resort.objects.all()
-    serializer_class = ResortSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    lookup_field = 'pk'
-
-    def perform_update(self, serializer):
-        instance = serializer.save()
-
-
-favourite_update_view = FavouriteUpdateView().as_view()
-
-
-class FavouriteAPIViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    lookup_field = 'pk'
 
 
 @api_view(["POST"])
