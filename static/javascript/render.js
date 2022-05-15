@@ -15,19 +15,21 @@ let weather = null;
 
 let weatherCache = [new Date(0,0,0,0,0,0,0), []];
 
+const weatherInterval = 6;
+
 const getWeather = async (resortId) => {
 	const urls = [
 		{
 			"id": 333031,
-			"url": "https://api.weatherunlocked.com/api/resortforecast/333031?app_id=a3fd6c9a&app_key=027a1023047a432b9ed2e4a7db484a07&hourly_interval=6"
+			"url": "https://api.weatherunlocked.com/api/resortforecast/333031?app_id=a3fd6c9a&app_key=027a1023047a432b9ed2e4a7db484a07&hourly_interval=" + weatherInterval
 		},
 		{
 			"id": 333005,
-			"url": "https://api.weatherunlocked.com/api/resortforecast/333005?app_id=4c84c18d&app_key=5f4b7efa21bbda9d00d158c7c11ac815&hourly_interval=6"
+			"url": "https://api.weatherunlocked.com/api/resortforecast/333005?app_id=4c84c18d&app_key=5f4b7efa21bbda9d00d158c7c11ac815&hourly_interval=" + weatherInterval
 		},
 		{
 			"id": 333014,
-			"url": "https://api.weatherunlocked.com/api/resortforecast/333014?app_id=62707ed6&app_key=10981bcbfd38f7a0b53bb253990c0cbf&hourly_interval=6"
+			"url": "https://api.weatherunlocked.com/api/resortforecast/333014?app_id=62707ed6&app_key=10981bcbfd38f7a0b53bb253990c0cbf&hourly_interval=" + weatherInterval
 		},
 	];
 	let url = null;
@@ -156,9 +158,13 @@ const showResort = async (resortId) => {
 	}
 	let weather = await getWeather(resortId);
 	if (weather != null) {
-		weather = [weather["forecast"][0]["base"]["wx_desc"], weather["forecast"][0]["base"]["wx_icon"]];
+		let weatherForecast = [];
+		for (let i = 0; i < Math.min(weather["forecast"].length, 6); i++) {
+			weatherForecast.push(weather["forecast"][i]["date"] + " " + weather["forecast"][i]["time"] + ": " + weather["forecast"][i]["base"]["wx_desc"]);
+		}
+		weather = [weather["forecast"][0]["base"]["wx_desc"], weather["forecast"][0]["base"]["wx_icon"], weatherForecast];
 	} else {
-		weather = ["Unknown", null];
+		weather = ["Unknown", null, []];
 	}
 	let image = resort["image"];
 	let name = resort["name"];
@@ -166,19 +172,21 @@ const showResort = async (resortId) => {
 	let resortDescription = resort["description"];
 	let totalFavourites = 0;
 	let isFavourite = resort["isFavourite"];
-	weather = weather[0];
 	const heroImage = document.createElement("div");
 	heroImage.style.backgroundImage = "url(" + (image || "/images/skiing.jpg") + ")";
-	addClasses(heroImage, ["container", "w-full", "mx-auto", "h-96", "bg-cover", "bg-center", "bg-no-repeat", "relative", "mb-12", "rounded-t-2xl", "mt-6", "select-none"]);
-	if (weather == "Unknown") {
+	addClasses(heroImage, ["w-full", "mx-auto", "h-96", "bg-cover", "bg-center", "bg-no-repeat", "relative", "mb-12", "select-none"]);
+	if (weather[0] == "Unknown") {
 		heroImage.classList.remove("h-96");
 		heroImage.style.height = "33rem";
 	} else {
 		const weatherIcon = document.createElement("div");
-		addClasses(weatherIcon, ["w-24", "h-24", "rounded-full", "bg-white", "bg-no-repeat", "bg-contain", "bg-center", "mx-auto", "absolute", "inset-x-0", "select-none"]);
+		addClasses(weatherIcon, ["w-24", "h-24", "rounded-full", "bg-white", "bg-no-repeat", "bg-contain", "bg-center", "mx-auto", "absolute", "inset-x-0", "select-none", "cursor-pointer"]);
 		weatherIcon.style.bottom = "-48px";
 		weatherIcon.style.backgroundImage = "url(\"" + "/icons/" + weatherImage + "\")";
-		weatherIcon.title = "Current weather of resort: " + weather;
+		weatherIcon.title = "Current weather of resort: " + weather[0];
+		weatherIcon.addEventListener("click", () => {
+			alert("Weather forecast for the next " + (weather[2].length * weatherInterval) + " hours:\n" + weather[2].join("\n"));
+		});
 		heroImage.append(weatherIcon);
 	}
 	const containerFlex = document.createElement("div");
