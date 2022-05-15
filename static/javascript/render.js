@@ -1,6 +1,6 @@
 "use strict";
 
-const demo = true;
+const demo = false;
 
 if ("serviceWorker" in navigator) {
 	window.addEventListener("load", () => {
@@ -13,7 +13,7 @@ if ("serviceWorker" in navigator) {
 
 let weather = null;
 
-let weatherCache = [new Date(0,0,0,0,0,0,0), []];
+let weatherCache = [new Date(0, 0, 0, 0, 0, 0, 0), []];
 
 const weatherInterval = 6;
 
@@ -43,7 +43,7 @@ const getWeather = async (resortId) => {
 		return null;
 	}
 	let cached = null;
-	if ((new Date(new Date().getTime() - 60000)) < weatherCache[0]){
+	if ((new Date(new Date().getTime() - 60000)) < weatherCache[0]) {
 		weatherCache[1].forEach(weatherCached => {
 			if (weatherCached["id"] == resortId) {
 				cached = weatherCached["weather"];
@@ -73,7 +73,7 @@ const getWeather = async (resortId) => {
 	});
 	if (!updated) {
 		weatherCache[0] = new Date();
-		weatherCache[1].push({"id": resortId, "weather": request});
+		weatherCache[1].push({ "id": resortId, "weather": request });
 	}
 	return request;
 }
@@ -84,10 +84,12 @@ const historicalWeather = async () => {
 	return weather;
 };
 
-const loading = (clear) => {
+const loading = (clear, append = false) => {
 	let main = document.getElementById("main");
 	addClasses(main, ["mb-6", "flex-auto"]);
-	main.innerHTML = "";
+	if (!append) {
+		main.innerHTML = "";
+	}
 	if (!clear) {
 		const loader = document.createElement("div");
 		loader.id = "loaderMessage";
@@ -156,6 +158,7 @@ const showResort = async (resortId) => {
 		newPage(pageId);
 		return;
 	}
+	pageId = resortId;
 	let weather = await getWeather(resortId);
 	if (weather != null) {
 		let weatherForecast = [];
@@ -206,6 +209,9 @@ const showResort = async (resortId) => {
 	mapLink.innerText = "Piste map";
 	mapLink.href = "http://maps.google.com/maps?z=14&t=p&q=loc:" + resort["latitude"] + "+" + resort["longitude"];
 	mapLink.target = "_blank";
+	if (pageId != resortId) {
+		return;
+	}
 	loading(true);
 	let main = document.getElementById("main");
 	main.appendChild(heroImage);
@@ -244,12 +250,12 @@ const signIn = (register, usernameString = "") => {
 	const username = document.createElement("input");
 	username.value = usernameString;
 	const passwords = [document.createElement("input"), document.createElement("input")];
-	addClasses(names[0], ["rounded-md", "border-black", "border", "block", "mx-auto"]);
-	addClasses(names[1], ["rounded-md", "border-black", "border", "block", "mx-auto"]);
-	addClasses(email, ["rounded-md", "border-black", "border", "block", "mx-auto"]);
-	addClasses(username, ["rounded-md", "border-black", "border", "block", "mx-auto"]);
-	addClasses(passwords[0], ["rounded-md", "border-black", "border", "block", "mx-auto"]);
-	addClasses(passwords[1], ["rounded-md", "border-black", "border", "block", "mx-auto"]);
+	addClasses(names[0], ["rounded-md", "border-black", "border", "block", "mx-auto", "px-2", "w-64"]);
+	addClasses(names[1], ["rounded-md", "border-black", "border", "block", "mx-auto", "px-2", "w-64"]);
+	addClasses(email, ["rounded-md", "border-black", "border", "block", "mx-auto", "px-2", "w-64"]);
+	addClasses(username, ["rounded-md", "border-black", "border", "block", "mx-auto", "px-2", "w-64"]);
+	addClasses(passwords[0], ["rounded-md", "border-black", "border", "block", "mx-auto", "px-2", "w-64"]);
+	addClasses(passwords[1], ["rounded-md", "border-black", "border", "block", "mx-auto", "px-2", "w-64"]);
 	names[0].setAttribute("required", "required");
 	names[1].setAttribute("required", "required");
 	email.setAttribute("required", "required");
@@ -386,6 +392,93 @@ const getResorts = async () => {
 		resorts[i]["isFavourite"] = false; // Call API
 	}
 	return [resorts, 0];
+};
+
+const createNewResort = async (update, name, description, longitude, latitude, image) => {
+	let error = false;
+	const request = await fetch("/rest_api/resort/", {
+		method: { false: "POST", true: "PUT" }[update],
+		headers: {
+			"Accept": "application/json",
+			"Content-Type": "application/json"
+		},
+		body: JSON.stringify({ "name": name, "description": description, "longitude": longitude, "latitude": latitude, "image": image})
+	}).catch(e => {
+		console.error(e);
+		error = true;
+	});
+	if (error) {
+		return null;
+	}
+	return await request.json();
+};
+
+const createNewResortPage = () => {
+	// name, address, lon, lat, description
+	document.title = "Create new resort | Snowcore";
+	const createResortContainer = document.createElement("form");
+	addClasses(createResortContainer, ["container", "w-full", "mx-auto"]);
+	const name = document.createElement("input");
+	const lonLat = [document.createElement("input"), document.createElement("input")];
+	lonLat[0].type = "number";
+	lonLat[0].max = "90.0000000";
+	lonLat[0].min = "-90.0000000";
+	lonLat[1].type = "number";
+	lonLat[1].max = "180.0000000";
+	lonLat[1].min = "-180.0000000";
+	const description = document.createElement("textarea");
+	description.style.resize = "none";
+	addClasses(name, ["rounded-md", "border-black", "border", "block", "mx-auto", "px-2", "w-64"]);
+	addClasses(lonLat[0], ["rounded-md", "border-black", "border", "block", "mx-auto", "px-2", "w-64"]);
+	addClasses(lonLat[1], ["rounded-md", "border-black", "border", "block", "mx-auto", "px-2", "w-64"]);
+	addClasses(description, ["rounded-md", "border-black", "border", "block", "mx-auto", "h-36", "px-2", "w-64"]);
+	name.setAttribute("required", "required");
+	lonLat[0].setAttribute("required", "required");
+	lonLat[1].setAttribute("required", "required");
+	description.setAttribute("required", "required");
+	const tips = [document.createElement("p"), document.createElement("p"), document.createElement("p"), document.createElement("p")];
+	tips[0].innerText = "Resort name:";
+	addClasses(tips[0], ["block", "text-center", "select-none"]);
+	tips[1].innerText = "Longitude:";
+	addClasses(tips[1], ["block", "text-center", "select-none"]);
+	tips[2].innerText = "Latitude:";
+	addClasses(tips[2], ["block", "text-center", "select-none"]);
+	tips[3].innerText = "Description:";
+	addClasses(tips[3], ["block", "text-center", "select-none"]);
+	const submit = document.createElement("input");
+	addClasses(submit, ["rounded-md", "block", "my-4", "p-2", "cursor-pointer", "bg-sky-500", "hover:bg-sky-700", "px-5", "py-2", "text-sm", "leading-5", "rounded-full", "font-semibold", "text-white", "mx-auto", "select-none"]);
+	submit.type = "submit";
+	submit.value = "Create resort";
+	addClasses(tips[0], ["pt-12"]);
+	createResortContainer.appendChild(tips[0]);
+	createResortContainer.appendChild(name);
+	createResortContainer.appendChild(tips[1]);
+	createResortContainer.appendChild(lonLat[0]);
+	createResortContainer.appendChild(tips[2]);
+	createResortContainer.appendChild(lonLat[1]);
+	createResortContainer.appendChild(tips[3]);
+	createResortContainer.appendChild(description);
+	createResortContainer.appendChild(submit);
+	submit.addEventListener("click", async (e) => {
+		e.preventDefault();
+		if (name.value.length == 0 || lonLat[0].value.length == 0 || lonLat[1].value.length == 0 || description.value.length == 0) {
+			alert("Please make sure you do not leave any field blank!");
+			return;
+		}
+		loading(false, true);
+		const response = await createNewResort(false, name.value, description.value, lonLat[0].value, lonLat[1].value, null);
+		if (response != null && "pk" in response) {
+			loading(false);
+			pageId = 0;
+			newPage(pageId);
+			return;
+		}
+		document.getElementById("loaderMessage").outerHTML = "";
+		alert("Failed to create resort!");
+	});
+	loading(true);
+	let main = document.getElementById("main");
+	main.appendChild(createResortContainer);
 };
 
 const newPage = async (pageId) => {
