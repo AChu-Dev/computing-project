@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 import json
 from django.http import JsonResponse
 from rest_framework import viewsets, generics, authentication, permissions
-from .seralizer import UserSerializer, ResortSerializer, FavouriteSerializer
+from .seralizer import UserSerializer, ResortSerializer, FavouriteSerializer, DjangoUserSerializer, DjangoUserSerializerInfo
 from .models import User, Resort, Favourite
 from django.views.generic.detail import SingleObjectMixin
 from django.views import View
@@ -15,10 +15,28 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404
+from django.contrib.auth import models
 # Create your views here.
 
 
-# USER VIEWS
+# USER VIEWS Django
+
+class DUserList(generics.ListAPIView):
+    queryset = models.User.objects.all()
+    serializer_class = DjangoUserSerializer
+
+
+duser_list_view = DUserList.as_view()
+
+
+class DUserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = DjangoUserSerializer
+
+
+duser_detail_view = DUserList.as_view()
+
+# USER VIEWS OLD
 
 class UserCreateView(generics.CreateAPIView):
     queryset = User.objects.all().order_by('firstName')
@@ -161,74 +179,47 @@ class ResortDetailDeleteUpdateView(APIView):
 resort_api_id_view = ResortDetailDeleteUpdateView.as_view()
 
 
-class ResortCreateViewOld(generics.CreateAPIView):
-    queryset = Resort.objects.all().order_by('name')
-    serializer_class = ResortSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
-
-resort_create_view = ResortCreateViewOld.as_view()
-
-
-class ResortDetailView(generics.RetrieveAPIView):
-    queryset = Resort.objects.all()
-    serializer_class = ResortSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
-
-resort_detail_view = ResortDetailView.as_view()
-
-
-class ResortListView(generics.ListAPIView):
-    queryset = Resort.objects.all()
-    serializer_class = ResortSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
-
-resort_list_view = ResortListView.as_view()
-
-
-class ResortDeleteView(generics.DestroyAPIView):
-    queryset = Resort.objects.all()
-    serializer_class = ResortSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    lookup_field = 'pk'
-
-    def delete_view(self, serializer):
-        instance = serializer.save()
-
-
-resort_delete_view = ResortDeleteView.as_view()
-
-
-class ResortUpdateView(generics.UpdateAPIView):
-    queryset = Resort.objects.all()
-    serializer_class = ResortSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    lookup_field = 'pk'
-
-    def perform_update(self, serializer):
-        instance = serializer.save()
-
-
-resort_update_view = ResortUpdateView.as_view()
-
-
-class ResortAPIViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    lookup_field = 'pk'
-
 # Favourite
+class FavouriteCreateView(APIView):
 
-
-class FavouriteCreateView(generics.CreateAPIView):
-    queryset = Favourite.objects.all().order_by('user_id')
-    serializer_class = FavouriteSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    def post(self, request, format=None):
+        serializer = FavouriteSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 favourite_create_view = FavouriteCreateView.as_view()
+
+
+class FavouriteDetailDeleteUpdateView(APIView):
+    def get_object(self, pk):
+        try:
+            return Favourite.objects.get(pk=pk)
+        except Favourite.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, *args, **kwargs):
+        fav = self.get_object(pk)
+        serializer = FavouriteSerializer(fav)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def delete(self, reqest, pk, format=None):
+        fav = self.get_object(pk)
+        fav.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def put(self, reqest, pk, format=None):
+        fav = reqest.get_object(pk)
+        serializer = FavouriteSerializer(fav, data=reqest.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+favourite_api_id_view = FavouriteDetailDeleteUpdateView.as_view()
 
 
 class FavouriteDetailView(generics.RetrieveAPIView):

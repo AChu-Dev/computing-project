@@ -5,6 +5,11 @@ from . import views
 
 urlpatterns = [
         path('auth/', obtain_auth_token),
+
+        path("duser/list/", views.duser_list_view),
+        path("duser/list/<int:pk>/", views.duser_detail_view),
+
+
         path('user/list/', views.user_list_view),
         path('user/create/', views.user_create_view),
         path('<int:pk>/user/detail/', views.user_detail_view),
@@ -12,11 +17,6 @@ urlpatterns = [
         path('<int:pk>/admin/update/', views.user_update_mixin),
         path('<int:pk>/user/delete/', views.user_delete_view),
 
-        path('resort/create/', views.resort_create_view),
-        path('<int:pk>/resort/detail/', views.resort_detail_view),
-        path('<int:pk>/resort/update/', views.resort_update_view),
-        path('<int:pk>/resort/delete/', views.resort_delete_view),
-        path('resort/list/', views.resort_list_view),
         path("resort/", views.resort_api_view),
         path("resort/<int:pk>/", views.resort_api_id_view),
 
@@ -27,6 +27,7 @@ urlpatterns = [
         path('favourite/list/', views.favourite_list_view),
         path('favourite/list/user/', views.favourite_list_user),
         path('favourite/list/resort/', views.favourite_list_resort),
+        path("favourite/<int:pk>", views.favourite_api_id_view),
 
         path('signup/', views.signup),
         path('signin/', views.signin),

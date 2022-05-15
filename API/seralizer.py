@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import User, Resort, Favourite
+from django.contrib.auth import models
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -12,9 +13,21 @@ class UserSerializer(serializers.ModelSerializer):
                 "lastName",
                 "email",
                 "permission",
-                "num_fav_resorts",
                 "password",
                 )
+
+
+class DjangoUserSerializerInfo(serializers.ModelSerializer):
+    class Meta:
+        model = models.User
+        fields = ["id", "username", "is_superuser", "last_login"]
+
+
+class DjangoUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.User
+        fields = ["id", "username", "first_name", "last_name", "email",
+                "password"]
 
 
 class ResortSerializer(serializers.ModelSerializer):
@@ -23,10 +36,10 @@ class ResortSerializer(serializers.ModelSerializer):
         fields = (
                 "pk",
                 "name",
-                "address",
                 "longitude",
                 "latitude",
                 "description",
+                "image",
                 )
 
 

@@ -25,10 +25,10 @@ class User(models.Model):
 
 class Resort(models.Model):
     name = models.CharField(max_length=48)
-    address = models.CharField(max_length=64)
     longitude = models.DecimalField(max_digits=7, decimal_places=5)
     latitude = models.DecimalField(max_digits=7, decimal_places=5)
-    description = models.CharField(max_length=256)
+    description = models.CharField(max_length=1024)
+    image = models.CharField(max_length=1024)
 
     def __self__(self):
         return self.name

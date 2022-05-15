@@ -20,9 +20,6 @@ from django.urls.conf import include
 from django.views.generic.base import RedirectView
 from users import views as user_views
 
-from rest_framework.routers import DefaultRouter
-from API.views import UserAPIViewSet, ResortAPIViewSet, FavouriteAPIViewSet
-
 class index(RedirectView): url = "/index.html"
 
 urlpatterns = [
