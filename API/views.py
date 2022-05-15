@@ -28,18 +28,6 @@ class UserCreateView(generics.CreateAPIView):
             ]
     permission_classes = [permissions.AllowAny]
 
-    #def create(self, seralizer):
-    #    firstName = seralizer.get('firstName')
-    #    lastName = seralizer.get('lastName')
-    #    email = seralizer.get('email')
-    #    username = seralizer.get('username')
-
-        # firstName = seralizer.validated_data.get('firstName')
-        # lastName = seralizer.validated_data.get('lastName')
-        # email = seralizer.validated_data.get('email')
-        # username = seralizer.validated_data.get('username')
-    #    seralizer.save()
-
 
 user_create_view = UserCreateView.as_view()
 
@@ -145,14 +133,6 @@ resort_api_view = ResortListAndCreateView.as_view()
 
 class ResortDetailDeleteUpdateView(APIView):
 
-    def get_queryset(self):
-        if self.request.method == "GET":
-            queryset = Resort.objects.all()
-            pk = self.request.GET.get("pk", None)
-            if pk is not None:
-                queryset = queryset.filter(pk=pk)
-            return queryset
-
     def get_object(self, pk):
         try:
             return Resort.objects.get(pk=pk)
@@ -160,19 +140,16 @@ class ResortDetailDeleteUpdateView(APIView):
             raise Http404
 
     def get(self, request, pk, *args, **kwargs):
-#        pk = self.reqest.GET.get("pk", None)
         resort = self.get_object(pk)
         serializer = ResortSerializer(resort)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, reqest, pk, format=None):
-#        pk = self.reqest.DELETE.get("pk", None)
         resort = self.get_object(pk)
         resort.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def put(self, reqest, pk, format=None):
-#        pk = self.reqest.PUT.get("pk", None)
         resort = reqest.get_object(pk)
         serializer = ResortSerializer(resort, data=reqest.data)
         if serializer.is_valid():
