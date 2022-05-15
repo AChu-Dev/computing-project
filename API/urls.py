@@ -18,6 +18,7 @@ urlpatterns = [
         path('<int:pk>/resort/delete/', views.resort_delete_view),
         path('resort/list/', views.resort_list_view),
         path("resort/", views.resort_api_view),
+        path("resorts/<int:pk>/", views.resort_api_id_view),
 
         path('favourite/create/', views.favourite_create_view),
         path('<int:pk>/favourite/detail/', views.favourite_detail_view),

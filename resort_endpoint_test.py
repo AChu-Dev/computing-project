@@ -9,6 +9,4 @@ response_get = requests.get("http://127.0.0.1:8000/rest_api/resort/")
 print(response_get)
 print(response_get.json())
 
-response_delete = requests.delete("http://127.0.0.1:8000/rest_api/resort/", data={"pk": "3"})
-print(response_delete)
-print(response_delete.json())
+response_delete = requests.delete("http://127.0.0.1:8000/rest_api/resorts/3/", data={"pk": "3"})
