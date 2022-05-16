@@ -252,18 +252,9 @@ class FavouriteCreateView(APIView):
 favourite_create_view = FavouriteCreateView.as_view()
 
 
-# permissions
-
-class IsAuthenticatedOrReadOnly(permissions.BasePermission):
-    def has_permission(self, request, view):
-        if (request.method in ["GET", "POST", "PUT", "DELETE"] or
-                request.user and request.user.is_authenticated()):
-            return True
-        return False
-
-
 class RegisterAPI(APIView):
     serializer_class = DjangoRegister
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request, *args, **kwargs):
         serializer = DjangoRegister(data=request.data)
@@ -284,6 +275,18 @@ class LoginAPI(LoginView):
         user = serializer.validated_data["user"]
         login(request, user)
         return super(LoginAPI, self).post(request, format=None)
+
+# permissions
+
+
+class IsAuthenticatedOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if (request.method in ["GET", "POST", "PUT", "DELETE"] or
+                request.user and request.user.is_authenticated()):
+            return True
+        return False
+
+
 
 
 @api_view(["POST"])
