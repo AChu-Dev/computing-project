@@ -1,6 +1,6 @@
 "use strict";
 
-const demo = false;
+const demo = true;
 
 if ("serviceWorker" in navigator) {
 	window.addEventListener("load", () => {
@@ -18,6 +18,15 @@ let weather = null;
 let weatherCache = [new Date(0, 0, 0, 0, 0, 0, 0), []];
 
 const weatherInterval = 6;
+
+const alert = async (title = "", message, type = "") => {
+	document.body.style.overflowY = "hidden";
+	setTimeout(() => {
+		document.getElementsByClassName("swal-overlay")[0].scrollTo(0, 0);
+	}, 1);
+	await swal({title: title, text: message, icon: type, button: "Close"});
+	document.body.style.overflowY = "unset";
+};
 
 const getWeather = async (resortId) => {
 	const urls = [
@@ -169,6 +178,7 @@ const showResorts = async (resorts) => {
 	const container = document.createElement("div");
 	addClasses(container, ["container", "mx-auto", "flex", "items-center", "flex-wrap", "pt-4", "pb-12"]);
 	resorts.forEach(resort => {
+		console.log(resort);
 		let test = createResort(resort["pk"], resort["name"], resort["image"], resort["isFavourite"]);
 		container.appendChild(test);
 	});
@@ -216,7 +226,7 @@ const showResort = async (resortId) => {
 		weatherIcon.style.backgroundImage = "url(\"" + "/icons/" + weatherImage + "\")";
 		weatherIcon.title = "Current weather of resort: " + weather[0];
 		weatherIcon.addEventListener("click", () => {
-			alert("Weather forecast for the next " + (weather[2].length * weatherInterval) + " hours:\n" + weather[2].join("\n"));
+			alert("Weather forecast for the next " + (weather[2].length * weatherInterval) + " hours:", weather[2].join("\n"));
 		});
 		heroImage.append(weatherIcon);
 	}
@@ -321,12 +331,12 @@ const signIn = (register, emailString = "") => {
 		e.preventDefault();
 		let requestBody = { password: passwords[0].value, username: email.value };
 		if (!(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value))) {
-			alert("That email address is invalid!");
+			alert("Wait a second", "That email address is invalid!", "warning");
 			return;
 		}
 		if (register) {
 			if (passwords[0].value != passwords[1].value || passwords[0].value.length == 0) {
-				alert("Please make sure both passwords match and are not blank.");
+				alert("Wait a second", "Please make sure both passwords match and are not blank.", "warning");
 				return;
 			}
 		}
@@ -341,9 +351,9 @@ const signIn = (register, emailString = "") => {
 		}).catch(e => {
 			signIn(register, requestBody["username"]);
 			if (register) {
-				alert("Failed to register your account.");
+				alert("", "Failed to register your account.", "error");
 			} else {
-				alert("Failed to sign in to your account.");
+				alert("", "Failed to sign in to your account.", "error");
 			}
 		});
 		const content = await request.json();
@@ -353,11 +363,11 @@ const signIn = (register, emailString = "") => {
 			newPage(pageId);
 			return;
 		} else if ("username" in content) {
-			alert(content["username"]);
+			alert("Error", content["username"], "error");
 		} else if (register){
-			alert("Failed to create user!");
+			alert("Error", "Failed to create user!", "error");
 		} else {
-			alert("Failed to sign in, please check your credentials!");
+			alert("Error", "Failed to sign in, please check your credentials!", "error");
 		}
 		loading(true);
 		newPage(pageId);
@@ -402,7 +412,7 @@ const getResorts = async () => {
 			return [null, 2];
 		}
 	} else {
-		resorts = [{ id: 333031, name: "Saint Martin De Belleville", longitude: 6.504810, latitude: 45.379800, description: "The Alpine area of Saint-Martin-de-Belleville is known for its charming namesake village, with traditional stone-and-wood farmhouses, plus a handful of Savoyard restaurants and ski rental shops.", image: "/images/Saint-Martin-de-Belleville-ski-resort-French-Alps-1920.jpg" }, { id: 333005, name: "Courchevel", longitude: 6.637370, latitude: 45.434330, description: "Courchevel is a French Alps ski resort. It is a part of Les Trois Vallées, the largest linked ski areas in the world. Courchevel also refers to the towns of Courchevel 1300, Courchevel 1550, Courchevel 1650, and Courchevel 1850, which are named for their altitudes in metres.", image: "/images/courchevel.jpg" }, { id: 333014, name: "Meribel", longitude: 6.566170, latitude: 45.396549, description: "Méribel is a ski resort in the French Alps. Méribel refers to three neighbouring villages in the Les Allues commune of the Savoie department of France, near the town of Moûtiers, called Méribel Centre, Méribel-Mottaret and Méribel Village.", image: "/images/Meribel.png" }]
+		resorts = [{ pk: 1, name: "Saint Martin De Belleville", longitude: 6.504810, latitude: 45.379800, description: "The Alpine area of Saint-Martin-de-Belleville is known for its charming namesake village, with traditional stone-and-wood farmhouses, plus a handful of Savoyard restaurants and ski rental shops.", image: "/images/Saint-Martin-de-Belleville-ski-resort-French-Alps-1920.jpg" }, { pk: 2, name: "Courchevel", longitude: 6.637370, latitude: 45.434330, description: "Courchevel is a French Alps ski resort. It is a part of Les Trois Vallées, the largest linked ski areas in the world. Courchevel also refers to the towns of Courchevel 1300, Courchevel 1550, Courchevel 1650, and Courchevel 1850, which are named for their altitudes in metres.", image: "/images/courchevel.jpg" }, { pk: 3, name: "Méribel", longitude: 6.566170, latitude: 45.396549, description: "Méribel is a ski resort in the French Alps. Méribel refers to three neighbouring villages in the Les Allues commune of the Savoie department of France, near the town of Moûtiers, called Méribel Centre, Méribel-Mottaret and Méribel Village.", image: "/images/Meribel.png" }]
 	}
 	for (let i = 0; i < resorts.length; i++) {
 		resorts[i]["image"] = resorts[i]["image"] || "/images/skiing.jpg";
@@ -479,7 +489,7 @@ const createNewResortPage = () => {
 	submit.addEventListener("click", async (e) => {
 		e.preventDefault();
 		if (name.value.length == 0 || lonLat[0].value.length == 0 || lonLat[1].value.length == 0 || description.value.length == 0) {
-			alert("Please make sure you do not leave any field blank!");
+			alert("","Please make sure you do not leave any field blank!", "warning");
 			return;
 		}
 		loading(false, true);
@@ -491,7 +501,7 @@ const createNewResortPage = () => {
 			return;
 		}
 		document.getElementById("loaderMessage").outerHTML = "";
-		alert("Failed to create resort!");
+		alert("Error", "Failed to create resort!", "error");
 	});
 	loading(true);
 	let main = document.getElementById("main");
