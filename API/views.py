@@ -279,4 +279,4 @@ def signin(request):
 @api_view(["POST"])
 def signout(request):
     logout(request)
-    return("success")
+    return Response(status=status.HTTP_200_OK)
