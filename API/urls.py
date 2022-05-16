@@ -4,7 +4,7 @@ from rest_framework.authtoken.views import obtain_auth_token
 from . import views
 
 urlpatterns = [
-        path('auth/', obtain_auth_token),
+        path('api-token-auth/', obtain_auth_token),
 
         path("duser/list/", views.duser_list_view),
         path("duser/list/<int:pk>/", views.duser_detail_view),
