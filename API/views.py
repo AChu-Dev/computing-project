@@ -17,6 +17,7 @@ from knox.views import LoginView, AuthToken
 
 
 class CreateUserDjango(APIView):
+    permissions_classes = [permissions.AllowAny]
     def get(self, request, format=None):
         users = models.User.objects.all()
         serializer = DjangoUserSerializer(users, many=True)
@@ -267,7 +268,7 @@ class RegisterAPI(APIView):
 
 
 class LoginAPI(LoginView):
-    permissions_classes = [permissions.AllowAny]
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request, format=None):
         serializer = DjangoLogin(data=request.data)
