@@ -19,12 +19,12 @@ let weatherCache = [new Date(0, 0, 0, 0, 0, 0, 0), []];
 
 const weatherInterval = 6;
 
-const alert = async (title = "", message, type = "") => {
+const alert = async (title = "", message, type = "", button = "Close") => {
 	document.body.style.overflowY = "hidden";
 	setTimeout(() => {
 		document.getElementsByClassName("swal-overlay")[0].scrollTo(0, 0);
 	}, 1);
-	await swal({title: title, text: message, icon: type, button: "Close"});
+	await swal({title: title, text: message, icon: type, button: button});
 	document.body.style.overflowY = "unset";
 };
 
@@ -331,40 +331,52 @@ const showResort = async (resortId) => {
 const signIn = (register, emailString = "") => {
 	const signInContainer = document.createElement("form");
 	addClasses(signInContainer, ["container", "w-full", "mx-auto"]);
+	const username = document.createElement("input");
 	const email = document.createElement("input");
 	email.value = emailString;
 	const passwords = [document.createElement("input"), document.createElement("input")];
+	addClasses(username, ["rounded-md", "border-black", "border", "block", "mx-auto", "px-2", "w-64"]);
 	addClasses(email, ["rounded-md", "border-black", "border", "block", "mx-auto", "px-2", "w-64"]);
 	addClasses(passwords[0], ["rounded-md", "border-black", "border", "block", "mx-auto", "px-2", "w-64"]);
 	addClasses(passwords[1], ["rounded-md", "border-black", "border", "block", "mx-auto", "px-2", "w-64"]);
+	username.setAttribute("required", "required");
 	email.setAttribute("required", "required");
 	passwords[0].setAttribute("required", "required");
 	passwords[1].setAttribute("required", "required");
 	email.type = "email";
 	passwords[0].type = "password";
 	passwords[1].type = "password";
-	const tips = [document.createElement("p"), document.createElement("p"), document.createElement("p")];
+	const tips = [document.createElement("p"), document.createElement("p"), document.createElement("p"), document.createElement("p")];
 	tips[0].innerText = "Email:";
 	addClasses(tips[0], ["block", "text-center", "select-none", "pt-12"]);
-	tips[1].innerText = "Password:";
+	tips[1].innerText = "Username:";
 	addClasses(tips[1], ["block", "text-center", "select-none"]);
-	tips[2].innerText = "Repeat password:";
+	tips[2].innerText = "Password:";
 	addClasses(tips[2], ["block", "text-center", "select-none"]);
+	tips[3].innerText = "Repeat password:";
+	addClasses(tips[3], ["block", "text-center", "select-none"]);
 	const submit = document.createElement("input");
 	addClasses(submit, ["rounded-md", "block", "my-4", "p-2", "cursor-pointer", "bg-sky-500", "hover:bg-sky-700", "px-5", "py-2", "text-sm", "leading-5", "rounded-full", "font-semibold", "text-white", "mx-auto", "w-64", "select-none"]);
 	submit.type = "submit";
 	submit.value = { true: "Register", false: "Sign in" }[register];
-	signInContainer.appendChild(tips[0]);
-	signInContainer.appendChild(email);
-	signInContainer.appendChild(tips[1]);
-	signInContainer.appendChild(passwords[0]);
 	if (register) {
 		document.title = "Sign up | Snowcore";
+		signInContainer.appendChild(tips[0]);
+		signInContainer.appendChild(email);
+		signInContainer.appendChild(tips[1]);
+		signInContainer.appendChild(username);
 		signInContainer.appendChild(tips[2]);
+		signInContainer.appendChild(passwords[0]);
+		signInContainer.appendChild(tips[3]);
 		signInContainer.appendChild(passwords[1]);
 		signInContainer.appendChild(submit);
 	} else {
 		document.title = "Sign in | Snowcore";
+		addClasses(tips[1], ["pt-12"]);
+		signInContainer.appendChild(tips[1]);
+		signInContainer.appendChild(username);
+		signInContainer.appendChild(tips[2]);
+		signInContainer.appendChild(passwords[0]);
 		signInContainer.appendChild(submit);
 		const register = document.createElement("input");
 		addClasses(register, ["rounded-md", "block", "my-4", "p-2", "cursor-pointer", "bg-sky-500", "hover:bg-sky-700", "px-5", "py-2", "text-sm", "leading-5", "rounded-full", "font-semibold", "text-white", "mx-auto", "w-64", "select-none"]);
@@ -377,19 +389,20 @@ const signIn = (register, emailString = "") => {
 	}
 	signInContainer.addEventListener("submit", async (e) => {
 		e.preventDefault();
-		let requestBody = { password: passwords[0].value, username: email.value };
-		if (!(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value))) {
-			alert("Wait a second", "That email address is invalid!", "warning");
-			return;
-		}
+		let requestBody = { password: passwords[0].value, username: username.value};
 		if (register) {
+			if (!(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value))) {
+				alert("Wait a second", "That email address is invalid!", "warning");
+				return;
+			}
+			requestBody["email"] = email.value;
 			if (passwords[0].value != passwords[1].value || passwords[0].value.length == 0) {
 				alert("Wait a second", "Please make sure both passwords match and are not blank.", "warning");
 				return;
 			}
 		}
 		loading(false);
-		const request = await fetch("/rest_api/" + {true: "register", false: "signin"}[register] + "/", {
+		const request = await fetch("/rest_api/" + {true: "register", false: "api-token-auth"}[register] + "/", {
 			method: "POST",
 			headers: {
 				"Accept": "application/json",
@@ -405,11 +418,43 @@ const signIn = (register, emailString = "") => {
 			}
 		});
 		const content = await request.json();
-		if ("user" in content && "id" in content["user"]) {
-			user["id"] = content["user"]["id"];
-			user["token"] = content["token"];
+		if ("user" in content) {
+			let error = false;
+			if (register) {
+				alert("Success", "Your account has successfully been created.", "success", "Continue");
+			}
+			const request2 = await fetch("/rest_api/duser/list/", {
+				method: "GET",
+				headers: {
+					"Accept": "application/json",
+					"Content-Type": "application/json"
+				},
+			}).catch(e => {
+				console.error(e);
+				error = true;
+			});
+			if (error) {
+				return null;
+			}
+			const usersList = await request2.json();
+			const request3 = await fetch("/rest_api/superuser/" + usersList.length + "/", {
+				method: "GET",
+				headers: {
+					"Accept": "application/json",
+					"Content-Type": "application/json"
+				},
+			}).catch(e => {
+				console.error(e);
+				error = true;
+			});
+			if (error) {
+				return null;
+			}
+			const userDetails = await request3.json();
+			user["id"] = userDetails["id"];
+			user["admin"] = userDetails["is_superuser"];
 			pageId = 0;
-			newPage(pageId);
+			newPage(0);
 			return;
 		} else if ("username" in content) {
 			alert("Error", content["username"].join("\n"), "error");
@@ -747,6 +792,9 @@ const newPage = async (pageId) => {
 			listUsers();
 			break;
 		case 6:
+			alert("Unimplemented", "Sorry, but this feature isn't implemented yet", "error");
+			pageId = 2;
+			newPage(pageId);
 			break;
 		default:
 			const loader = document.getElementById("loaderMessage");
