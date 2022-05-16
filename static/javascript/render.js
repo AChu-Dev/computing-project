@@ -1,6 +1,6 @@
 "use strict";
 
-const demo = true;
+const demo = false;
 
 if ("serviceWorker" in navigator) {
 	window.addEventListener("load", () => {
@@ -11,7 +11,7 @@ if ("serviceWorker" in navigator) {
 	})
 }
 
-let user = { id: null, admin: false };
+let user = { id: null, admin: false, token: null};
 
 let weather = null;
 
@@ -138,6 +138,21 @@ const addClasses = (element, classList) => {
 	});
 };
 
+const setFavourite = (element) => {
+	if (!element.hasAttribute("state")) {
+		element.setAttribute("state", "0");
+	}
+	let state = (element.getAttribute("state") != "0");
+	if (state) {
+		element.innerHTML = "<svg class=\"h-6 w-6 fill-current text-gray-500 hover:text-black\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z\" /></svg>";
+	} else {
+		element.innerHTML = "<svg class=\"h-6 w-6 fill-current text-gray-500 hover:text-black\" width=\"24\" height=\"24\" xmlns=\"http://www.w3.org/2000/svg\" fill-rule=\"evenodd\" clip-rule=\"evenodd\"><path d=\"M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402m5.726-20.583c-2.203 0-4.446 1.042-5.726 3.238-1.285-2.206-3.522-3.248-5.719-3.248-3.183 0-6.281 2.187-6.281 6.191 0 4.661 5.571 9.429 12 15.809 6.43-6.38 12-11.148 12-15.809 0-4.011-3.095-6.181-6.274-6.181\"/></svg>";
+	}
+	state = !state;
+	element.setAttribute("state", (state ? "1" : "0"));
+	return state;
+};
+
 const createResort = (id, name, image, isFavourite) => {
 	const container = document.createElement("div");
 	addClasses(container, ["w-full", "md:w-1/3", "xl:w-1/4", "p-6", "flex", "flex-col", "cursor-pointer"]);
@@ -151,11 +166,20 @@ const createResort = (id, name, image, isFavourite) => {
 	addClasses(resortName, ["text-ellipsis", "overflow-hidden"]);
 	resortName.style.lineHeight = "2ch";
 	resortName.style.maxHeight = "2ch";
-	const favourite = document.createElement("svg");
-	if (isFavourite) {
-		favourite.innerHTML = "<svg class=\"h-6 w-6 fill-current text-gray-500 hover:text-black\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z\" /></svg>";
-	} else {
-		favourite.innerHTML = "<svg class=\"h-6 w-6 fill-current text-gray-500 hover:text-black\" width=\"24\" height=\"24\" xmlns=\"http://www.w3.org/2000/svg\" fill-rule=\"evenodd\" clip-rule=\"evenodd\"><path d=\"M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402m5.726-20.583c-2.203 0-4.446 1.042-5.726 3.238-1.285-2.206-3.522-3.248-5.719-3.248-3.183 0-6.281 2.187-6.281 6.191 0 4.661 5.571 9.429 12 15.809 6.43-6.38 12-11.148 12-15.809 0-4.011-3.095-6.181-6.274-6.181\"/></svg>";
+	let favourite = null;
+	if (user["id"] != null) {
+		favourite = document.createElement("svg");
+		setFavourite(favourite);
+		if (isFavourite != 0) {
+			setFavourite(favourite);
+		}
+		favourite.addEventListener("click", async () => {
+			const newFavourite = !setFavourite(favourite);
+			const favouriteId = await favouriteResort(newFavourite, id, isFavourite);
+			if (newFavourite) {
+				isFavourite = favouriteId;
+			}
+		});
 	}
 	heroImage.addEventListener("click", () => {
 		showResort(id);
@@ -164,7 +188,9 @@ const createResort = (id, name, image, isFavourite) => {
 		showResort(id);
 	});
 	containerFlex.appendChild(resortName);
-	containerFlex.appendChild(favourite);
+	if (user["id"] != null) {
+		containerFlex.appendChild(favourite);
+	}
 	container.appendChild(heroImage);
 	container.appendChild(containerFlex);
 	container.title = "View " + name;
@@ -178,9 +204,8 @@ const showResorts = async (resorts) => {
 	const container = document.createElement("div");
 	addClasses(container, ["container", "mx-auto", "flex", "items-center", "flex-wrap", "pt-4", "pb-12"]);
 	resorts.forEach(resort => {
-		console.log(resort);
-		let test = createResort(resort["pk"], resort["name"], resort["image"], resort["isFavourite"]);
-		container.appendChild(test);
+		let resortRender = createResort(resort["pk"], resort["name"], resort["image"], resort["isFavourite"]);
+		container.appendChild(resortRender);
 	});
 	section.innerHTML = "";
 	section.appendChild(container);
@@ -234,12 +259,33 @@ const showResort = async (resortId) => {
 	addClasses(containerFlex, ["flex", "items-center", "px-8", "mb-8", "justify-center", "select-none"]);
 	const resortName = document.createElement("h2");
 	resortName.innerText = name;
-	addClasses(resortName, ["container", "px-8", "text-center", "text-4xl", "pb-2", "mx-auto", "select-none"]);
-	const favourite = document.createElement("svg");
-	if (isFavourite) {
-		favourite.innerHTML = "<svg class=\"h-6 w-6 fill-current text-gray-500 hover:text-black ml-4\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z\" /></svg>";
-	} else {
-		favourite.innerHTML = "<svg class=\"h-6 w-6 fill-current text-gray-500 hover:text-black ml-4\" width=\"24\" height=\"24\" xmlns=\"http://www.w3.org/2000/svg\" fill-rule=\"evenodd\" clip-rule=\"evenodd\"><path d=\"M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402m5.726-20.583c-2.203 0-4.446 1.042-5.726 3.238-1.285-2.206-3.522-3.248-5.719-3.248-3.183 0-6.281 2.187-6.281 6.191 0 4.661 5.571 9.429 12 15.809 6.43-6.38 12-11.148 12-15.809 0-4.011-3.095-6.181-6.274-6.181\"/></svg>";
+	addClasses(resortName, ["container", "px-8", "text-center", "text-4xl", "pb-2", "ml-2", "mx-auto", "select-none"]);
+	let favourite = null;
+	if (user["id"] != null) {
+		let isFavourite = 0;
+		const favourites = await getFavourites();
+		favourites.forEach(favouriteData => {
+			if (favouriteData[0] == resort["pk"]) {
+				isFavourite = favouriteData[1];
+			}
+		});
+		favourite = document.createElement("svg");
+		addClasses(favourite, ["pl-2"])
+		setFavourite(favourite);
+		if (isFavourite != 0) {
+			setFavourite(favourite);
+		}
+		favourite.addEventListener("click", async () => {
+			const newFavourite = !setFavourite(favourite);
+			const favouriteId = await favouriteResort(newFavourite, resort["pk"], isFavourite);
+			const counter = document.getElementById("resortFavouriteCount");
+			if (newFavourite) {
+				isFavourite = favouriteId;
+				counter.innerText = (parseInt(counter.innerText) + 1);
+			} else {
+				counter.innerText = (parseInt(counter.innerText) - 1);
+			}
+		});
 	}
 	let descriptions = resortDescription.split("\n");
 	let mapLink = document.createElement("a");
@@ -259,7 +305,9 @@ const showResort = async (resortId) => {
 	favouriteParagraph.innerHTML = "Favourited by: <span id=\"resortFavouriteCount\">" + totalFavourites + "</span> users";
 	addClasses(favouriteParagraph, ["text-center"]);
 	containerFlex.appendChild(favouriteParagraph);
-	containerFlex.appendChild(favourite);
+	if (user["id"] != null) {
+		containerFlex.appendChild(favourite);
+	}
 	main.appendChild(containerFlex);
 	let top = true;
 	descriptions.forEach(paragraph => {
@@ -341,7 +389,7 @@ const signIn = (register, emailString = "") => {
 			}
 		}
 		loading(false);
-		const request = await fetch("/rest_api/duser/create2/", {
+		const request = await fetch("/rest_api/" + {true: "register", false: "signin"}[register] + "/", {
 			method: "POST",
 			headers: {
 				"Accept": "application/json",
@@ -357,20 +405,21 @@ const signIn = (register, emailString = "") => {
 			}
 		});
 		const content = await request.json();
-		if ("id" in content) {
-			user["id"] = content["id"];
+		if ("user" in content && "id" in content["user"]) {
+			user["id"] = content["user"]["id"];
+			user["token"] = content["token"];
 			pageId = 0;
 			newPage(pageId);
 			return;
 		} else if ("username" in content) {
-			alert("Error", content["username"], "error");
+			alert("Error", content["username"].join("\n"), "error");
 		} else if (register){
 			alert("Error", "Failed to create user!", "error");
 		} else {
 			alert("Error", "Failed to sign in, please check your credentials!", "error");
 		}
 		loading(true);
-		newPage(pageId);
+		signIn(register);
 	});
 	loading(true);
 	document.getElementById("main").appendChild(signInContainer);
@@ -508,6 +557,98 @@ const createNewResortPage = () => {
 	main.appendChild(createResortContainer);
 };
 
+const getFavourites = async () => {
+	let favourites = [];
+	if (user["id"] === null) {
+		return favourites;
+	}
+	let error = false;
+	const request = await fetch("/rest_api/favourite/list/user/?pk=" + user["id"], {
+		method: "GET",
+		headers: {
+			"Accept": "application/json",
+			"Content-Type": "application/json"
+		},
+	}).catch(e => {
+		console.error(e);
+		error = true;
+	});
+	if (error) {
+		return favourites;
+	}
+	const response = await request.json();
+	response.forEach(favourite => {
+		favourites.push([favourite["resort_id"], favourite["pk"]]);
+	});
+	return favourites;
+}
+
+const favouriteResort = async (favourite, resortId, favouriteId = "") => {
+	if (user["id"] === null) {
+		return;
+	}
+	if (favourite) {
+		favouriteId = "";
+	} else if (favouriteId != "") {
+		favouriteId = favouriteId + "/";
+	}
+	let error = false;
+	const requestBody = {"resort_id": resortId, "user_id": user["id"]};
+	const request = await fetch("/rest_api/favourite/" + favouriteId, {
+		method: {true: "POST", false: "DELETE"}[favourite],
+		headers: {
+			"Accept": "application/json",
+			"Content-Type": "application/json"
+		},
+		body: JSON.stringify(requestBody),
+	}).catch(e => {
+		console.error(e);
+		error = true;
+	});
+	if (!favourite) {
+		return null;
+	} else if (error) {
+		return 0;
+	}
+	const response = await request.json();
+	return response["pk"];
+};
+
+const listUsers = async () => {
+	loading(false);
+	let error = false;
+	const request = await fetch("/rest_api/duser/list/", {
+		method: "GET",
+		headers: {
+			"Accept": "application/json",
+			"Content-Type": "application/json"
+		},
+	}).catch(e => {
+		console.error(e);
+		error = true;
+	});
+	if (error) {
+		return null;
+	}
+	const users = await request.json();
+	if (pageId != 5) {
+		return;
+	}
+	loading(true);
+	let main = document.getElementById("main");
+	let total = document.createElement("p");
+	total.innerText = "There are " + users.length + " registered users" + {true: ":", false: "."}[users.length > 0];
+	addClasses(total, ["block", "text-center", "select-none", "pt-12", "mb-2", "font-bold"]);
+	main.appendChild(total);
+	users.forEach(userData => {
+		let userDataPara = document.createElement("p");
+		userDataPara.innerText = userData["username"];
+		addClasses(userDataPara, ["block", "text-center", "pt-2"]);
+		main.appendChild(userDataPara);
+	});
+	document.title = "List of users | Snowcore";
+};
+
 const userMenu = (admin) => {
 	loading(false);
 	const links = [document.createElement("button"), document.createElement("button"), document.createElement("button"), document.createElement("button"), document.createElement("button")];
@@ -578,9 +719,15 @@ const newPage = async (pageId) => {
 				}
 				break;
 			}
+			const favourites = await getFavourites();
 			for (let i = 0; i < resorts.length; i++) {
 				resorts[i]["image"] = resorts[i]["image"] || "/images/skiing.jpg";
-				resorts[i]["isFavourite"] = false; // Call API
+				resorts[i]["isFavourite"] = 0;
+				favourites.forEach(favourite => {
+					if (resorts[i]["pk"] == favourite[0]) {
+						resorts[i]["isFavourite"] = favourite[1];
+					}
+				});
 			}
 			showResorts(resorts);
 			break;
@@ -597,6 +744,7 @@ const newPage = async (pageId) => {
 			createNewResortPage(false);
 			break;
 		case 5:
+			listUsers();
 			break;
 		case 6:
 			break;
