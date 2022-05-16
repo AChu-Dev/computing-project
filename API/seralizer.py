@@ -36,6 +36,33 @@ class DjangoUserSerializer(serializers.ModelSerializer):
                 )
 
 
+class DjangoLogin(serializers.ModelSerializer):
+    class Meta:
+        model = models.User
+        fields = (
+                "id",
+                "username",
+                "email"
+                )
+
+class DjangoRegister(serializers.ModelSerializer):
+    class Meta:
+        model = models.User
+        fields = (
+                "id",
+                "username",
+                "email",
+                "password",
+                )
+        extra_kwargs = {"password" : {"write_only": True}}
+
+        def create(self, data):
+            user = models.User.objects.create_user(data["username"], data["email"], data["password"])
+
+            return user
+
+
+
 class ResortSerializer(serializers.ModelSerializer):
     class Meta:
         model = Resort
@@ -47,7 +74,7 @@ class ResortSerializer(serializers.ModelSerializer):
                 "description",
                 "image",
                 )
-
+2
 
 class FavouriteSerializer(serializers.ModelSerializer):
     class Meta:

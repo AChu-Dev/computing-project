@@ -9,3 +9,4 @@ whitenoise
 dj-database-url
 matplotlib
 django-cors-headers
+django-rest-knox
