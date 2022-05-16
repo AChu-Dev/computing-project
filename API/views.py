@@ -35,7 +35,7 @@ create_user_django = CreateUserDjango.as_view()
 
 
 class SuperUserCheck(APIView):
-    permissions_classes = [permissions.IsAuthenticated]
+#    permissions_classes = [permissions.IsAuthenticated]
 
     def get_object(self, pk):
         try:
@@ -70,7 +70,7 @@ duser_list_view = DUserList.as_view()
 
 
 class DUserDetail(generics.RetrieveAPIView):
-    permissions_classes = [permissions.IsAuthenticated]
+#    permissions_classes = [permissions.IsAuthenticated]
 
     def get_object(self, pk):
         try:
@@ -90,7 +90,7 @@ duser_detail_view = DUserList.as_view()
 
 
 class ResortListAndCreateView(APIView):
-    permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
+#    permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
     def get(self, request, format=None):
         resorts = Resort.objects.all()
         serializer = ResortSerializer(resorts, many=True)
@@ -108,7 +108,7 @@ resort_api_view = ResortListAndCreateView.as_view()
 
 
 class ResortDetailDeleteUpdateView(APIView):
-    permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
+#    permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_object(self, pk):
         try:
@@ -140,7 +140,7 @@ resort_api_id_view = ResortDetailDeleteUpdateView.as_view()
 
 # Favourite
 class FavouriteCreateView(APIView):
-    permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
+#    permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
     def get(self, request, format=None):
         fav = Favourite.objects.all()
         serializer = FavouriteSerializer(fav, many=True)
@@ -158,7 +158,7 @@ favourite_create_view = FavouriteCreateView.as_view()
 
 
 class FavouriteDetailDeleteUpdateView(APIView):
-    permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
+#    permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_object(self, pk):
         try:
@@ -189,7 +189,7 @@ favourite_api_id_view = FavouriteDetailDeleteUpdateView.as_view()
 
 
 class FavouriteDetailView(generics.RetrieveAPIView):
-    permissions_classes = [permissions.IsAuthenticated]
+#    permissions_classes = [permissions.IsAuthenticated]
     queryset = Favourite.objects.all()
     serializer_class = FavouriteSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -199,7 +199,7 @@ favourite_detail_view = FavouriteDetailView.as_view()
 
 
 class FavouriteListView(generics.ListAPIView):
-    permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
+#    permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Favourite.objects.all()
     serializer_class = FavouriteSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -209,7 +209,7 @@ favourite_list_view = FavouriteListView.as_view()
 
 
 class FavouriteListByUser(generics.ListAPIView):
-    permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
+#    permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
     serializer_class = FavouriteSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
@@ -227,7 +227,7 @@ favourite_list_user = FavouriteListByUser.as_view()
 
 class FavouriteListByResort(generics.ListAPIView):
     serializer_class = FavouriteSerializer
-    permission_classes = [permissions.IsAuthenticated]
+ #   permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         if self.request.method == "GET":
@@ -256,7 +256,7 @@ favourite_create_view = FavouriteCreateView.as_view()
 
 class RegisterAPI(APIView):
     serializer_class = DjangoRegister
-    permission_classes = [permissions.AllowAny]
+ #   permission_classes = [permissions.AllowAny]
 
     def post(self, request, *args, **kwargs):
         serializer = DjangoRegister(data=request.data)
@@ -269,7 +269,7 @@ class RegisterAPI(APIView):
 
 
 class LoginAPI(LoginView):
-    permission_classes = [permissions.AllowAny]
+ #   permission_classes = [permissions.AllowAny]
 
     def post(self, request, format=None):
         serializer = DjangoLogin(data=request.data)
