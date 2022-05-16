@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
-from rest_framework import viewsets, generics, authentication, permissions
-from .seralizer import ResortSerializer, FavouriteSerializer, DjangoUserSerializer, DjangoSuperUserSerializer
+from rest_framework import viewsets, generics, authentication, permissions 
+from .seralizer import ResortSerializer, FavouriteSerializer, DjangoUserSerializer, DjangoSuperUserSerializer, DjangoDetailUserSerializer
 from .models import Resort, Favourite
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -32,6 +32,8 @@ create_user_django = CreateUserDjango.as_view()
 
 
 class SuperUserCheck(APIView):
+    permissions_classes = [permissions.IsAuthenticated]
+
     def get_object(self, pk):
         try:
             return Resort.objects.get(pk=pk)
@@ -64,8 +66,18 @@ duser_list_view = DUserList.as_view()
 
 
 class DUserDetail(generics.RetrieveAPIView):
-    queryset = models.User.objects.all()
-    serializer_class = DjangoUserSerializer
+    permissions_classes = [permissions.IsAuthenticated]
+
+    def get_object(self, pk):
+        try:
+            return models.User.objects.get(pk=pk)
+        except models.User.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, *args, **kwargs):
+        user = self.get_object(pk)
+        serializer = DjangoDetailUserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 duser_detail_view = DUserList.as_view()
@@ -73,13 +85,8 @@ duser_detail_view = DUserList.as_view()
 # RESORT VIEWS
 
 
-class ResortViewSet(viewsets.ModelViewSet):
-    queryset = Resort.objects.all().order_by('name')
-    serializer_class = ResortSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
-
 class ResortListAndCreateView(APIView):
+    permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
     def get(self, request, format=None):
         resorts = Resort.objects.all()
         serializer = ResortSerializer(resorts, many=True)
@@ -97,6 +104,7 @@ resort_api_view = ResortListAndCreateView.as_view()
 
 
 class ResortDetailDeleteUpdateView(APIView):
+    permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_object(self, pk):
         try:
@@ -128,6 +136,7 @@ resort_api_id_view = ResortDetailDeleteUpdateView.as_view()
 
 # Favourite
 class FavouriteCreateView(APIView):
+    permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
     def get(self, request, format=None):
         fav = Favourite.objects.all()
         serializer = FavouriteSerializer(fav, many=True)
@@ -145,6 +154,8 @@ favourite_create_view = FavouriteCreateView.as_view()
 
 
 class FavouriteDetailDeleteUpdateView(APIView):
+    permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
+
     def get_object(self, pk):
         try:
             return Favourite.objects.get(pk=pk)
@@ -174,6 +185,7 @@ favourite_api_id_view = FavouriteDetailDeleteUpdateView.as_view()
 
 
 class FavouriteDetailView(generics.RetrieveAPIView):
+    permissions_classes = [permissions.IsAuthenticated]
     queryset = Favourite.objects.all()
     serializer_class = FavouriteSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -183,6 +195,7 @@ favourite_detail_view = FavouriteDetailView.as_view()
 
 
 class FavouriteListView(generics.ListAPIView):
+    permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Favourite.objects.all()
     serializer_class = FavouriteSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -192,6 +205,7 @@ favourite_list_view = FavouriteListView.as_view()
 
 
 class FavouriteListByUser(generics.ListAPIView):
+    permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
     serializer_class = FavouriteSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
@@ -209,7 +223,7 @@ favourite_list_user = FavouriteListByUser.as_view()
 
 class FavouriteListByResort(generics.ListAPIView):
     serializer_class = FavouriteSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         if self.request.method == "GET":
@@ -235,6 +249,15 @@ class FavouriteCreateView(APIView):
 
 favourite_create_view = FavouriteCreateView.as_view()
 
+
+# permissions
+
+class IsAuthenticatedOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if (request.method in ["GET", "POST", "PUT", "DELETE"] or
+                request.user and request.user.is_authenticated()):
+            return True
+        return False
 
 
 

@@ -13,10 +13,10 @@ class User(models.Model):
     email = models.CharField(max_length=64)
     password = models.CharField(max_length=32)
     permission = models.IntegerField(default=0)
-    num_fav_resorts = models.IntegerField(default=0)#
+    num_fav_resorts = models.IntegerField(default=0)
 
     def __self__(self):
-        return self.firstName, self.lastName#
+        return self.firstName, self.lastName
 
     @property
     def path(self):
