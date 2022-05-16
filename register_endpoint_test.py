@@ -42,7 +42,7 @@ response_get = requests.get("http://127.0.0.1:8000/rest_api/resort/")
 print(response_get.status_code)
 print(response_get.json())
 assertEqual(response_get, 200)
-print('--------------------------------------------------
+print('--------------------------------------------------')
 
 signup0 = {"username":["Joe"], "email":["Joe@Appleton.co.uk"], "password1": ["JoeAppleton"]}
 response0 = requests.post("http://127.0.0.1:8000/rest_api/duser/create/", data = signup0)
