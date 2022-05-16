@@ -21,6 +21,7 @@ urlpatterns = [
         path('favourite/list/resort/', views.favourite_list_resort),
         path("favourite/<int:pk>/", views.favourite_api_id_view),
 
+        #path('signin/', views.LoginAPI.as_view()),
         path('signin/', views.LoginAPI.as_view()),
         path("register/", views.RegisterAPI.as_view()),
 #        path('signout/', views),

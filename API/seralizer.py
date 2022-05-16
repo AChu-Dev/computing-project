@@ -11,10 +11,11 @@ class DjangoDetailUserSerializer(serializers.ModelSerializer):
         model = models.User
         fields = ["id", "username", "first_name", "last_name", "data_joined", "is_active", "is_staff"]
 
+
 class DjangoSuperUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.User
-        fields = ["id", "username", "is_superuser", "last_login"]
+        fields = ["id", "username", "is_superuser"]
 
 
 class DjangoUserSerializer(serializers.ModelSerializer):

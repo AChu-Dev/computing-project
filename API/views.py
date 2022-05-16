@@ -39,8 +39,8 @@ class SuperUserCheck(APIView):
 
     def get_object(self, pk):
         try:
-            return Resort.objects.get(pk=pk)
-        except Resort.DoesNotExist:
+            return models.User.objects.get(pk=pk)
+        except models.User.DoesNotExist:
             raise Http404
 
     def get(self, request, pk, *args, **kwargs):
@@ -62,7 +62,8 @@ class LoginUserDjango(APIView):
 
 class DUserList(generics.ListAPIView):
     queryset = models.User.objects.all()
-    serializer_class = DjangoUserSerializer
+    serializer_class = DjangoSuperUserSerializer
+
 
 
 duser_list_view = DUserList.as_view()
