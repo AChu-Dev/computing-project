@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from rest_framework import viewsets, generics, authentication, permissions
-from .seralizer import ResortSerializer, FavouriteSerializer, DjangoUserSerializer, DjangoUserSerializerInfo
+from .seralizer import ResortSerializer, FavouriteSerializer, DjangoUserSerializer, DjangoSuperUserSerializer
 from .models import Resort, Favourite
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -29,6 +29,22 @@ class CreateUserDjango(APIView):
 
 
 create_user_django = CreateUserDjango.as_view()
+
+
+class SuperUserCheck(APIView):
+    def get_object(self, pk):
+        try:
+            return Resort.objects.get(pk=pk)
+        except Resort.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, *args, **kwargs):
+        user = self.get_object(pk)
+        serializer = DjangoSuperUserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+superuser_django = SuperUserCheck.as_view()
 
 
 class LoginUserDjango(APIView):

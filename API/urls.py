@@ -9,6 +9,7 @@ urlpatterns = [
         path("duser/list/", views.duser_list_view),
         path("duser/list/<int:pk>/", views.duser_detail_view),
         path("duser/create/", views.create_user_django),
+        path("superuser/<int:pk>/", views.superuser_django),
 
         path("resort/", views.resort_api_view),
         path("resort/<int:pk>/", views.resort_api_id_view),
