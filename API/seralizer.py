@@ -6,6 +6,11 @@ from django.contrib.auth import models, get_user_model
 UserModel = get_user_model()
 
 
+class DjangoDetailUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.User
+        fields = ["id", "username", "first_name", "last_name", "data_joined", "is_active", "is_staff"]
+
 class DjangoSuperUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.User
