@@ -35,7 +35,7 @@ for x in range(0, 3):
     print(datav1)
     response_post = requests.post("http://127.0.0.1:8000/rest_api/resort/", data = datav1)
     print(response_post.status_code)
-    assertEqual(response_post, 201)
+    assertEqual(response_post, 403)
 print('------------------------------------------------------')
 
 print('LIST TEST - RESORT')
@@ -48,12 +48,12 @@ print('------------------------------------------------------')
 print('UPDATE TEST - RESORT')
 response_update = requests.put("http://127.0.0.1:8000/rest_api/resort/1/", data = datav2)
 print(response_update.status_code)
-assertEqual(response_update, 204)
+assertEqual(response_update, 403)
 print('------------------------------------------------------')
 
 print('DELETE TEST - RESORT')
 response_delete = requests.delete("http://127.0.0.1:8000/rest_api/resort/2/", data={})
 print(response_delete.status_code)
-assertEqual(response_delete, 204)
+assertEqual(response_delete, 403)
 print('------------------------------------------------------')
 
